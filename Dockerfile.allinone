@@ -1,0 +1,143 @@
+# ============================================================================
+# OhmVision - Dockerfile All-in-One
+# Single container avec Backend + Frontend + AI Engine
+# ============================================================================
+
+# Stage 1: Build Frontend
+FROM node:20-alpine AS frontend-builder
+
+WORKDIR /app/frontend
+
+# Copy package files
+COPY frontend-client/package*.json ./
+
+# Install dependencies
+RUN npm ci --silent
+
+# Copy source
+COPY frontend-client/ ./
+
+# Build production
+RUN npm run build
+
+
+# Stage 2: Build Backend + Runtime
+FROM python:3.11-slim AS runtime
+
+# Metadata
+LABEL maintainer="OhmVision <contact@ohmvision.fr>"
+LABEL version="1.0.0"
+LABEL description="OhmVision - AI Video Surveillance Platform"
+
+# Environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    DEBIAN_FRONTEND=noninteractive
+
+# System dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # FFmpeg for video processing
+    ffmpeg \
+    # OpenCV dependencies
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    libgomp1 \
+    # Network tools
+    iputils-ping \
+    net-tools \
+    # Cleanup
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create app user
+RUN useradd --create-home --shell /bin/bash ohmvision
+
+# Create directories
+RUN mkdir -p /app/data /app/recordings /app/models /app/logs \
+    && chown -R ohmvision:ohmvision /app
+
+WORKDIR /app
+
+# Install Python dependencies
+COPY backend/requirements.txt ./requirements.txt
+
+# Use CPU-only torch for smaller image
+RUN pip install --no-cache-dir \
+    torch==2.1.0+cpu \
+    torchvision==0.16.0+cpu \
+    -f https://download.pytorch.org/whl/cpu/torch_stable.html
+
+# Install onnxruntime CPU (not GPU for smaller image)
+RUN pip install --no-cache-dir onnxruntime==1.16.3
+
+# Install other requirements (excluding torch/onnxruntime-gpu)
+RUN grep -v "^torch\|^torchvision\|^onnxruntime" requirements.txt > requirements-filtered.txt \
+    && pip install --no-cache-dir -r requirements-filtered.txt \
+    && rm requirements-filtered.txt requirements.txt
+
+# Copy backend source
+COPY backend/ ./backend/
+COPY backend/services/ ./backend/services/
+
+# Copy frontend build
+COPY --from=frontend-builder /app/frontend/dist ./static/
+
+# Download YOLO models
+RUN python -c "from ultralytics import YOLO; YOLO('yolov8n.pt')" \
+    && mv *.pt /app/models/ || true
+
+# Create startup script
+RUN cat > /app/start.sh << 'EOF'
+#!/bin/bash
+set -e
+
+echo "========================================"
+echo "  🎥 OhmVision - Starting..."
+echo "========================================"
+
+# Create data directory if not exists
+mkdir -p /app/data /app/recordings /app/logs
+
+# Initialize database if needed
+cd /app/backend
+python -c "
+from core.database import engine, Base
+import asyncio
+async def init():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    print('✅ Database initialized')
+asyncio.run(init())
+"
+
+# Start the application
+echo "🚀 Starting OhmVision server..."
+exec uvicorn backend.main:app \
+    --host 0.0.0.0 \
+    --port 8080 \
+    --workers 1 \
+    --log-level info
+EOF
+
+RUN chmod +x /app/start.sh
+
+# Add health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Switch to non-root user
+USER ohmvision
+
+# Expose port
+EXPOSE 8080
+
+# Volumes for persistent data
+VOLUME ["/app/data", "/app/recordings", "/app/logs"]
+
+# Start
+CMD ["/app/start.sh"]

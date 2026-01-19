@@ -1,0 +1,170 @@
+# OhmVision Platform - Docker Compose
+# =====================================
+# Déploiement complet de la plateforme
+
+version: '3.8'
+
+services:
+  # ===================
+  # DATABASE
+  # ===================
+  postgres:
+    image: postgres:15-alpine
+    container_name: ohmvision-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ohmvision
+      POSTGRES_USER: ohmvision
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ohmvision_secret}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ohmvision"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===================
+  # REDIS (Cache & Queue)
+  # ===================
+  redis:
+    image: redis:7-alpine
+    container_name: ohmvision-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===================
+  # BACKEND API
+  # ===================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ohmvision-api
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://ohmvision:${DB_PASSWORD:-ohmvision_secret}@postgres:5432/ohmvision
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-jwt-secret-change-me}
+      - DEBUG=false
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - uploads_data:/app/uploads
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+
+  # ===================
+  # CELERY WORKER (Background Tasks)
+  # ===================
+  celery:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ohmvision-celery
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://ohmvision:${DB_PASSWORD:-ohmvision_secret}@postgres:5432/ohmvision
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - backend
+      - redis
+    command: celery -A core.celery worker --loglevel=info
+
+  # ===================
+  # FRONTEND ADMIN
+  # ===================
+  admin:
+    build:
+      context: ./frontend-admin
+      dockerfile: Dockerfile
+    container_name: ohmvision-admin
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  # ===================
+  # FRONTEND CLIENT
+  # ===================
+  client:
+    build:
+      context: ./frontend-client
+      dockerfile: Dockerfile
+    container_name: ohmvision-client
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
+
+  # ===================
+  # NGINX (Reverse Proxy)
+  # ===================
+  nginx:
+    image: nginx:alpine
+    container_name: ohmvision-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+      - admin
+      - client
+
+  # ===================
+  # AI ENGINE (Video Processing)
+  # ===================
+  ai-engine:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.ai
+    container_name: ohmvision-ai
+    restart: unless-stopped
+    environment:
+      - API_URL=http://backend:8000
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - models_data:/app/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    depends_on:
+      - backend
+      - redis
+
+volumes:
+  postgres_data:
+  redis_data:
+  uploads_data:
+  models_data:
+
+networks:
+  default:
+    name: ohmvision-network
