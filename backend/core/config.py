@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     SECRET_KEY: str = "ohmvision-super-secret-key-change-in-production"
     
+    # Supabase
+    SUPABASE_URL: str = ""
+    SUPABASE_ANON_KEY: str = ""
+    
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://ohmvision:ohmvision_secret@localhost:5432/ohmvision"
     
