@@ -1,0 +1,26 @@
+#!/usr/bin/env expect -f
+
+# Script Expect pour automatiser le déploiement SSH
+set timeout -1
+set password "tUUFWCRgJ3TV"
+set server_ip "195.201.123.92"
+
+spawn ssh -o StrictHostKeyChecking=no root@$server_ip
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "# " {
+        send "echo '✅ Connexion réussie!'\r"
+        send "cd /root && bash -s\r"
+    }
+}
+
+expect "# "
+send [exec cat /workspaces/ohmvision/install-on-server.sh]
+send "\r"
+send "exit\r"
+
+expect eof
