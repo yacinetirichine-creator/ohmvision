@@ -11,6 +11,9 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timedelta
 import json
+import os
+from openai import AsyncOpenAI
+from dotenv import load_dotenv
 
 from core.database import get_db
 from core.config import settings
@@ -19,6 +22,9 @@ from models.models import (
     Contract, AlertType, AlertSeverity
 )
 from api.auth import get_current_active_user
+
+# Charger les variables d'environnement
+load_dotenv()
 
 router = APIRouter()
 
@@ -48,6 +54,9 @@ class DiagnosticResponse(BaseModel):
 # Agent IA Engine (simplifié - en production, utiliser Anthropic/OpenAI)
 class AIAgent:
     """Agent IA pour le support et l'optimisation"""
+    
+    # Client OpenAI
+    client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     
     # Base de connaissances
     KNOWLEDGE_BASE = {
@@ -138,69 +147,98 @@ class AIAgent:
         context: Dict[str, Any],
         db: AsyncSession
     ) -> ChatResponse:
-        """Génère une réponse intelligente"""
+        """Génère une réponse intelligente avec OpenAI"""
         
-        analysis = cls.analyze_message(message)
         actions_taken = []
         suggestions = []
         requires_human = False
+        response_text = ""
         
-        if analysis["issue_type"] == "unknown":
-            # Problème non identifié
-            response = """Je n'ai pas pu identifier précisément votre problème. 
+        # 1. Analyse locale rapide (Règles métier & Redirections Email)
+        message_lower = message.lower()
+        
+        # Redirection Administrative
+        if any(kw in message_lower for kw in ["facture", "administratif", "compta", "paiement"]):
+            return ChatResponse(
+                response="Pour toute question administrative ou concernant votre facturation, je vous invite à contacter notre service dédié à l'adresse suivante : **admin@ohmtronic.fr**.",
+                suggestions=["Contacter le support", "Voir mes factures"]
+            )
             
-Pouvez-vous me donner plus de détails ?
-- Quelle caméra est concernée ?
-- Depuis quand avez-vous ce problème ?
-- Avez-vous un message d'erreur ?
+        # Redirection Commerciale
+        if any(kw in message_lower for kw in ["commercial", "marketing", "devis", "offre", "prix", "tarif"]):
+            return ChatResponse(
+                response="Pour vos demandes commerciales, marketing ou pour obtenir un devis, merci de contacter directement M. Yaakoub à l'adresse : **yaakoub@ohmtronic.fr**.",
+                suggestions=["Demander un devis", "Voir les tarifs"]
+            )
 
-Je peux aussi créer un ticket pour qu'un technicien vous contacte."""
-            requires_human = True
-            
-        else:
+        # 2. Analyse technique via la base de connaissances
+        analysis = cls.analyze_message(message)
+        
+        if analysis["issue_type"] != "unknown":
+            # Si on a trouvé une solution locale, on l'utilise (c'est plus rapide et fiable pour le support technique basique)
             data = analysis["data"]
             issue_type = analysis["issue_type"]
             
-            # Génère le diagnostic
             diagnosis_text = "\n".join([f"• {d}" for d in data["diagnosis"]])
             solutions_text = "\n".join([f"• {s}" for s in data["solutions"]])
             
-            # Actions automatiques possibles
+            # Actions automatiques
             if context.get("camera_id"):
                 camera_id = context["camera_id"]
-                
                 if "adjust_sensitivity" in data["auto_actions"]:
-                    # Simulation d'ajustement automatique
                     actions_taken.append(f"✅ Sensibilité ajustée automatiquement pour la caméra {camera_id}")
-                
                 if "ping_camera" in data["auto_actions"]:
                     actions_taken.append(f"✅ Test de connexion effectué sur la caméra {camera_id}")
             
-            # Suggestions
             suggestions = data["solutions"][:3]
             
-            # Génère la réponse
-            response = f"""🔍 **Diagnostic effectué**
-
-J'ai identifié votre problème : **{issue_type.replace('_', ' ').title()}**
-
-**Analyse réalisée :**
-{diagnosis_text}
-
-**Solutions recommandées :**
-{solutions_text}
-
-"""
+            response_text = f"🔍 **Diagnostic (Auto)**\n\nJ'ai identifié : **{issue_type.replace('_', ' ').title()}**\n\n**Solutions :**\n{solutions_text}"
             if actions_taken:
-                response += f"""**Actions automatiques appliquées :**
-{chr(10).join(actions_taken)}
+                response_text += f"\n\n**Actions :**\n{chr(10).join(actions_taken)}"
 
-"""
+            return ChatResponse(
+                response=response_text,
+                actions_taken=actions_taken,
+                suggestions=suggestions,
+                requires_human=False
+            )
+
+        # 3. Fallback sur OpenAI pour les questions complexes
+        try:
+            # Construction du contexte système
+            system_prompt = """Tu es l'Assistant IA d'OhmVision, une plateforme de vidéosurveillance intelligente.
+            Ton rôle est d'aider les utilisateurs techniques et administrateurs.
             
-            response += "Avez-vous besoin d'aide supplémentaire ?"
-        
+            RÈGLES DE REDIRECTION IMPORTANTES :
+            - Si l'utilisateur parle de facture, administratif, paiement -> Redirige vers **admin@ohmtronic.fr**
+            - Si l'utilisateur parle de commercial, marketing, devis, prix -> Redirige vers **yaakoub@ohmtronic.fr**
+            
+            RÈGLES DE RÉPONSE :
+            - Sois concis, professionnel et technique.
+            - Utilise le format Markdown.
+            - Si tu ne sais pas, propose de contacter le support humain.
+            """
+
+            completion = await cls.client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": message}
+                ],
+                temperature=0.7,
+                max_tokens=300
+            )
+            
+            response_text = completion.choices[0].message.content
+            
+        except Exception as e:
+            # Fallback en cas d'erreur API (ou pas de clé)
+            print(f"Erreur OpenAI: {e}")
+            response_text = "Je n'ai pas pu analyser votre demande en détail. Veuillez contacter le support technique ou reformuler."
+            requires_human = True
+
         return ChatResponse(
-            response=response,
+            response=response_text,
             actions_taken=actions_taken,
             suggestions=suggestions,
             requires_human=requires_human

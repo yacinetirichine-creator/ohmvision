@@ -22,35 +22,38 @@ import {
   Car
 } from 'lucide-react';
 import { useAnalyticsStore, useCamerasStore, useAlertsStore } from '../services/store';
+import TutorialOverlay from '../components/TutorialOverlay';
 
-// Stat Card Component
+// Stat Card Component (Futuristic Update)
 const StatCard = ({ icon: Icon, label, value, trend, trendValue, color = 'primary' }) => {
   const colorClasses = {
-    primary: 'from-primary/20 to-primary/5 text-primary',
-    success: 'from-success/20 to-success/5 text-success',
-    warning: 'from-warning/20 to-warning/5 text-warning',
-    danger: 'from-danger/20 to-danger/5 text-danger',
-    purple: 'from-purple/20 to-purple/5 text-purple'
+    primary: 'text-ohm-cyan drop-shadow-[0_0_5px_rgba(0,240,255,0.5)]',
+    success: 'text-success drop-shadow-[0_0_5px_rgba(34,197,94,0.5)]',
+    warning: 'text-warning drop-shadow-[0_0_5px_rgba(245,158,11,0.5)]',
+    danger: 'text-danger drop-shadow-[0_0_5px_rgba(239,68,68,0.5)]',
+    purple: 'text-ohm-purple drop-shadow-[0_0_5px_rgba(188,19,254,0.5)]'
   };
   
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-dark-800 rounded-2xl p-5 border border-dark-600"
+      className="glass-card p-5 relative overflow-hidden group"
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colorClasses[color]} flex items-center justify-center`}>
+      <div className="absolute top-0 right-0 p-8 bg-white/5 rounded-full blur-xl group-hover:bg-ohm-cyan/10 transition-colors duration-500"></div>
+      
+      <div className="flex items-start justify-between mb-4 relative z-10">
+        <div className={`w-12 h-12 rounded-xl bg-dark-900/50 border border-white/10 flex items-center justify-center ${colorClasses[color]}`}>
           <Icon size={24} />
         </div>
         {trend && (
-          <div className={`flex items-center gap-1 text-sm ${trend === 'up' ? 'text-success' : 'text-danger'}`}>
+          <div className={`flex items-center gap-1 text-sm font-mono ${trend === 'up' ? 'text-success' : 'text-danger'}`}>
             {trend === 'up' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
             <span>{trendValue}</span>
           </div>
         )}
       </div>
-      <p className="text-3xl font-bold mb-1">{value}</p>
+      <p className="text-3xl font-bold mb-1 text-white tracking-tight">{value}</p>
       <p className="text-sm text-gray-400">{label}</p>
     </motion.div>
   );
@@ -63,41 +66,44 @@ const CameraCard = ({ camera }) => {
       <motion.div
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className="bg-dark-800 rounded-2xl overflow-hidden border border-dark-600 group"
+        className="glass-card overflow-hidden group"
       >
         {/* Video Preview */}
-        <div className="relative aspect-video bg-dark-700">
+        <div className="relative aspect-video bg-dark-900">
+          {/* Grid Overlay */}
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
+
           {/* Placeholder - in production, show actual video thumbnail */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <Camera size={40} className="text-gray-600" />
+            <Camera size={40} className="text-ohm-cyan/50" />
           </div>
           
           {/* Status indicator */}
-          <div className={`absolute top-3 left-3 flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium ${
+          <div className={`absolute top-3 left-3 flex items-center gap-2 px-2 py-1 rounded-sm text-xs font-bold border ${
             camera.is_online
-              ? 'bg-success/20 text-success'
-              : 'bg-danger/20 text-danger'
+              ? 'bg-success/10 text-success border-success/30'
+              : 'bg-danger/10 text-danger border-danger/30'
           }`}>
             {camera.is_online ? <Wifi size={12} /> : <WifiOff size={12} />}
-            {camera.is_online ? 'En ligne' : 'Hors ligne'}
+            {camera.is_online ? 'ONLINE' : 'OFFLINE'}
           </div>
           
           {/* Live indicator */}
           {camera.is_online && (
-            <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 bg-danger rounded-full text-xs font-medium">
+            <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 bg-danger/80 backdrop-blur rounded-sm text-xs font-bold shadow-[0_0_10px_rgba(239,68,68,0.5)]">
               <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
               LIVE
             </div>
           )}
           
           {/* Overlay on hover */}
-          <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <Eye size={32} className="text-white" />
+          <div className="absolute inset-0 bg-ohm-cyan/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center border-2 border-ohm-cyan/50">
+            <Eye size={32} className="text-white drop-shadow-[0_0_5px_rgba(0,240,255,1)]" />
           </div>
         </div>
         
         {/* Info */}
-        <div className="p-4">
+        <div className="p-4 bg-dark-850/50 backdrop-blur-sm">
           <h3 className="font-semibold truncate">{camera.name}</h3>
           <p className="text-sm text-gray-400 truncate">{camera.location || 'Aucun emplacement'}</p>
           
@@ -198,11 +204,39 @@ export default function Dashboard() {
   const { cameras, fetchCameras } = useCamerasStore();
   const { alerts, fetchAlerts } = useAlertsStore();
   
+  // Tutorial State
+  const [showTutorial, setShowTutorial] = useState(false);
+
   useEffect(() => {
     fetchDashboard();
     fetchCameras();
     fetchAlerts({ limit: 5 });
+    
+    const hasSeenTutorial = localStorage.getItem('ohm_tutorial_seen');
+    if (!hasSeenTutorial) {
+        setTimeout(() => setShowTutorial(true), 1500);
+    }
   }, []);
+
+  const closeTutorial = () => {
+      setShowTutorial(false);
+      localStorage.setItem('ohm_tutorial_seen', 'true');
+  };
+
+  const tutorialSteps = [
+      {
+          title: "Bienvenue sur OhmVision",
+          content: "Votre interface de sécurité v3.0 est prête. Ce tableau de bord centralise l'intelligence de votre site."
+      },
+      {
+          title: "Indicateurs Clés",
+          content: "Surveillez ici l'état de santé de vos caméras et le nombre d'alertes en temps réel."
+      },
+      {
+          title: "Actions Rapides",
+          content: "Lancez des analyses ou générez des rapports en un clic depuis cette barre d'actions."
+      }
+  ];
   
   const stats = dashboard || {
     cameras: { total: 0, online: 0, offline: 0 },
@@ -213,15 +247,25 @@ export default function Dashboard() {
   
   return (
     <div className="space-y-6">
+      <TutorialOverlay isOpen={showTutorial} onClose={closeTutorial} steps={tutorialSteps} />
+
       {/* Welcome */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Bonjour ! 👋</h1>
-          <p className="text-gray-400">Voici un aperçu de votre activité</p>
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">Bonjour ! 👋</h1>
+          <p className="text-gray-400">Système de sécurité actif - <span className="text-ohm-cyan font-mono">v3.0.1</span></p>
         </div>
-        <div className="hidden md:flex items-center gap-2 text-sm text-gray-400">
-          <Activity size={16} className="text-success" />
-          Système opérationnel
+        <div className="hidden md:flex items-center gap-3">
+          <button 
+             onClick={() => setShowTutorial(true)}
+             className="text-xs font-mono text-ohm-cyan/70 hover:text-ohm-cyan underline underline-offset-4"
+          >
+             TUTORIAL_MODE
+          </button>
+          <div className="px-3 py-1 rounded bg-success/10 border border-success/30 text-success text-sm flex items-center gap-2">
+            <Activity size={16} />
+            <span>SYSTÈME ONLINE</span>
+          </div>
         </div>
       </div>
       

@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bot, Send, Sparkles, AlertCircle, CheckCircle, Lightbulb,
-  RefreshCw, Zap, Camera, Settings, ChevronRight, MessageSquare
+  RefreshCw, Zap, Camera, Settings, ChevronRight, MessageSquare, Activity
 } from 'lucide-react';
 import { useAIStore, useCamerasStore } from '../services/store';
 
@@ -20,23 +20,32 @@ const AIAssistant = () => {
   const [diagnosticResult, setDiagnosticResult] = useState(null);
   const messagesEndRef = useRef(null);
   
+  // New States for Visual Effects
+  const [audioInputLevel, setAudioInputLevel] = useState(0);
+
   useEffect(() => {
     fetchCameras();
     getSuggestions();
+    
+    // Simulate AI "Thinking" pulse
+    const interval = setInterval(() => {
+        setAudioInputLevel(Math.random() * 100);
+    }, 100);
+    return () => clearInterval(interval);
   }, []);
   
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
   
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const handleSend = async (text = null) => {
+    const messageToSend = text || input;
+    if (!messageToSend.trim()) return;
     
-    const message = input;
     setInput('');
     setShowQuickActions(false);
     
-    await sendMessage(message);
+    await sendMessage(messageToSend);
   };
   
   const handleQuickAction = async (action) => {
@@ -48,16 +57,16 @@ const AIAssistant = () => {
         setDiagnosticResult(result);
         break;
       case 'optimize':
-        await sendMessage("Optimise mes caméras pour réduire les faux positifs");
+        await handleSend("Optimise mes caméras pour réduire les faux positifs");
         break;
       case 'report':
-        await sendMessage("Génère un rapport de la semaine dernière");
+        await handleSend("Génère un rapport de la semaine dernière");
         break;
       case 'help':
-        await sendMessage("Quelles sont les fonctionnalités disponibles ?");
+        await handleSend("Quelles sont les fonctionnalités disponibles ?");
         break;
       default:
-        await sendMessage(action);
+        await handleSend(action);
     }
   };
   
@@ -100,284 +109,189 @@ const AIAssistant = () => {
   ];
   
   return (
-    <div className="flex flex-col h-[calc(100vh-12rem)] lg:h-[calc(100vh-8rem)]">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-purple to-primary rounded-2xl flex items-center justify-center">
-            <Bot size={24} />
+    <div className="flex h-[calc(100vh-100px)] gap-6">
+      <div className="flex-1 flex flex-col bg-dark-800/50 backdrop-blur-sm rounded-2xl border border-white/5 overflow-hidden shadow-2xl relative">
+        {/* Header */}
+        <div className="p-4 border-b border-white/5 bg-dark-900/50 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-ohm-cyan to-ohm-blue flex items-center justify-center shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all duration-300 ${isTyping ? 'animate-pulse' : ''}`}>
+              <Bot size={24} className="text-dark-950" />
+            </div>
+            <div>
+              <h2 className="font-bold flex items-center gap-2">
+                OhmVision AI
+                <span className="text-[10px] bg-ohm-cyan/10 text-ohm-cyan border border-ohm-cyan/20 px-1.5 py-0.5 rounded uppercase tracking-wider">Beta</span>
+              </h2>
+              <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                <span className={`w-1.5 h-1.5 rounded-full ${isTyping ? 'bg-ohm-cyan animate-ping' : 'bg-green-500'}`} />
+                {isTyping ? 'Analyse en cours...' : 'Prêt à aider'}
+              </div>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold">Assistant IA</h1>
-            <p className="text-sm text-gray-500">Posez vos questions, je suis là pour vous aider</p>
-          </div>
+          
+          <button 
+            onClick={clearMessages}
+            className="p-2 hover:bg-white/5 rounded-lg text-gray-400 hover:text-white transition-colors"
+            title="Effacer la conversation"
+          >
+            <RefreshCw size={18} />
+          </button>
         </div>
         
-        {messages.length > 0 && (
-          <button
-            onClick={clearMessages}
-            className="px-3 py-1.5 text-sm text-gray-400 hover:text-white hover:bg-dark-700 rounded-lg"
-          >
-            Nouvelle conversation
-          </button>
-        )}
-      </div>
-      
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto bg-dark-800 rounded-2xl p-4 space-y-4">
-        {/* Quick Actions (when no messages) */}
-        {messages.length === 0 && showQuickActions && (
-          <div className="space-y-6">
-            {/* Welcome */}
-            <div className="text-center py-8">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple/20 to-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Sparkles size={36} className="text-primary" />
-              </div>
-              <h2 className="text-xl font-bold mb-2">Comment puis-je vous aider ?</h2>
-              <p className="text-gray-500 max-w-md mx-auto">
-                Je peux diagnostiquer vos caméras, optimiser les détections, générer des rapports et répondre à toutes vos questions.
-              </p>
-            </div>
-            
-            {/* Quick Action Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {quickActions.map((action) => (
-                <motion.button
-                  key={action.id}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleQuickAction(action.id)}
-                  className={`p-4 bg-dark-700 hover:bg-dark-600 rounded-xl text-left flex items-start gap-3`}
-                >
-                  <div className={`w-10 h-10 rounded-lg bg-${action.color}/20 flex items-center justify-center flex-shrink-0`}>
-                    <action.icon size={20} className={`text-${action.color}`} />
-                  </div>
-                  <div>
-                    <p className="font-medium">{action.title}</p>
-                    <p className="text-sm text-gray-500">{action.description}</p>
-                  </div>
-                  <ChevronRight size={18} className="text-gray-600 ml-auto self-center" />
-                </motion.button>
-              ))}
-            </div>
-            
-            {/* Suggestions */}
-            {suggestions.length > 0 && (
-              <div>
-                <p className="text-sm text-gray-500 mb-3">💡 Suggestions pour vous</p>
-                <div className="space-y-2">
-                  {suggestions.slice(0, 3).map((suggestion, index) => (
+        {/* Messages with futuristic background */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 relative">
+          <div className="absolute inset-0 pointer-events-none opacity-5 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-ohm-cyan via-transparent to-transparent"></div>
+          
+          <AnimatePresence>
+            {messages.length === 0 && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center justify-center h-full text-center p-8 text-gray-400"
+              >
+                <div className="w-24 h-24 bg-dark-800 rounded-full flex items-center justify-center mb-6 border border-white/5 relative group">
+                    <div className="absolute inset-0 bg-ohm-cyan/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <Bot size={48} className="text-ohm-cyan/50" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Comment puis-je vous aider ?</h3>
+                <p className="max-w-md mx-auto mb-8">
+                  Je peux analyser vos flux vidéo, optimiser les réglages de détection ou générer des rapports de sécurité.
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
+                  {suggestionMessages.map((msg, idx) => (
                     <button
-                      key={index}
-                      onClick={() => handleQuickAction(suggestion.message)}
-                      className="w-full p-3 bg-dark-700/50 hover:bg-dark-600 rounded-lg text-left text-sm"
+                      key={idx}
+                      onClick={() => handleSend(msg)}
+                      className="text-left p-4 rounded-xl bg-dark-900/50 border border-white/5 hover:border-ohm-cyan/50 hover:bg-dark-800 transition-all text-sm group"
                     >
-                      {suggestion.message}
+                      <span className="text-gray-300 group-hover:text-white transition-colors">{msg}</span>
                     </button>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             )}
-            
-            {/* Sample Questions */}
-            <div>
-              <p className="text-sm text-gray-500 mb-3">Essayez de demander :</p>
-              <div className="flex flex-wrap gap-2">
-                {suggestionMessages.map((msg, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleQuickAction(msg)}
-                    className="px-3 py-1.5 bg-dark-700 hover:bg-dark-600 rounded-full text-sm"
-                  >
-                    {msg}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {/* Diagnostic Result */}
-        {diagnosticResult && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-dark-700 rounded-xl p-4"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <Zap size={18} className="text-primary" />
-              <span className="font-medium">Résultat du diagnostic</span>
-            </div>
-            
-            {diagnosticResult.issues_found?.length > 0 ? (
-              <div className="space-y-2 mb-4">
-                {diagnosticResult.issues_found.map((issue, index) => (
-                  <div
-                    key={index}
-                    className={`p-3 rounded-lg ${
-                      issue.severity === 'high' ? 'bg-danger/10 border border-danger/30' :
-                      issue.severity === 'medium' ? 'bg-warning/10 border border-warning/30' :
-                      'bg-dark-600'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <AlertCircle size={16} className={
-                        issue.severity === 'high' ? 'text-danger' :
-                        issue.severity === 'medium' ? 'text-warning' : 'text-gray-400'
-                      } />
-                      <span className="font-medium">{issue.message}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="p-3 bg-success/10 border border-success/30 rounded-lg mb-4">
-                <div className="flex items-center gap-2 text-success">
-                  <CheckCircle size={16} />
-                  <span>Aucun problème détecté !</span>
+
+            {messages.map((msg) => (
+              <motion.div
+                key={msg.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                layout
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div className={`
+                  max-w-[80%] rounded-2xl p-4 shadow-lg backdrop-blur-sm border
+                  ${msg.role === 'user'
+                    ? 'bg-gradient-to-r from-ohm-blue to-ohm-cyan text-white rounded-br-none border-transparent' 
+                    : 'bg-dark-900/80 border-white/10 rounded-bl-none text-gray-100'}
+                `}>
+                  <p className="whitespace-pre-wrap">{msg.content || msg.text}</p>
                 </div>
-              </div>
+              </motion.div>
+            ))}
+            
+            {/* Visualisation de la "pensée" de l'IA */}
+            {isTyping && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+                 <div className="bg-dark-900/80 border border-white/10 rounded-2xl rounded-bl-none p-4 flex items-center gap-2">
+                    <span className="w-2 h-2 bg-ohm-cyan rounded-full animate-bounce delay-75"></span>
+                    <span className="w-2 h-2 bg-ohm-cyan rounded-full animate-bounce delay-150"></span>
+                    <span className="w-2 h-2 bg-ohm-cyan rounded-full animate-bounce delay-300"></span>
+                 </div>
+              </motion.div>
             )}
             
-            {diagnosticResult.recommendations?.length > 0 && (
-              <div>
-                <p className="text-sm text-gray-500 mb-2">Recommandations :</p>
-                <ul className="space-y-1">
-                  {diagnosticResult.recommendations.map((rec, index) => (
-                    <li key={index} className="text-sm flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      {rec}
-                    </li>
+            <div ref={messagesEndRef} />
+          </AnimatePresence>
+        </div>
+
+        {/* Input Area */}
+        <div className="p-4 bg-dark-900/80 border-t border-white/5">
+           {/* Quick Actions Scroll */}
+           <AnimatePresence>
+             {messages.length > 0 && (
+               <motion.div 
+                 initial={{ opacity: 0, height: 0 }}
+                 animate={{ opacity: 1, height: 'auto' }}
+                 className="flex gap-2 mb-4 overflow-x-auto pb-2 no-scrollbar"
+               >
+                  {quickActions.map(action => (
+                     <button 
+                       key={action.id}
+                       onClick={() => handleQuickAction(action.id)}
+                       className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-ohm-cyan/50 hover:bg-white/10 transition-all text-xs font-medium whitespace-nowrap"
+                     >
+                        <action.icon size={12} className={`text-${action.color === 'primary' ? 'ohm-cyan' : action.color}`} />
+                        {action.title}
+                     </button>
                   ))}
-                </ul>
-              </div>
-            )}
-            
-            {diagnosticResult.auto_fixes_applied?.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-dark-600">
-                <p className="text-sm text-success flex items-center gap-2">
-                  <CheckCircle size={14} />
-                  {diagnosticResult.auto_fixes_applied.length} correction(s) automatique(s) appliquée(s)
-                </p>
-              </div>
-            )}
-            
-            <button
-              onClick={() => setDiagnosticResult(null)}
-              className="mt-4 text-sm text-gray-400 hover:text-white"
-            >
-              Fermer
-            </button>
-          </motion.div>
-        )}
-        
-        {/* Chat Messages */}
-        {messages.map((message) => (
-          <motion.div
-            key={message.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div className={`max-w-[80%] ${message.role === 'user' ? 'order-2' : ''}`}>
-              {message.role === 'assistant' && (
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 bg-gradient-to-br from-purple to-primary rounded-full flex items-center justify-center">
-                    <Bot size={14} />
-                  </div>
-                  <span className="text-sm text-gray-500">Assistant IA</span>
-                </div>
-              )}
-              
-              <div className={`p-4 rounded-2xl ${
-                message.role === 'user'
-                  ? 'bg-primary text-white rounded-br-md'
-                  : 'bg-dark-700 rounded-bl-md'
-              }`}>
-                <div className="whitespace-pre-wrap">{message.content}</div>
-                
-                {/* Actions taken */}
-                {message.actions?.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-white/20 space-y-1">
-                    {message.actions.map((action, index) => (
-                      <p key={index} className="text-sm opacity-80">{action}</p>
-                    ))}
-                  </div>
-                )}
-                
-                {/* Suggestions */}
-                {message.suggestions?.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {message.suggestions.map((suggestion, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleQuickAction(suggestion)}
-                        className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-full text-sm"
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              
-              <p className="text-xs text-gray-600 mt-1 px-2">
-                {new Date(message.timestamp).toLocaleTimeString()}
-              </p>
-            </div>
-          </motion.div>
-        ))}
-        
-        {/* Typing Indicator */}
-        {isTyping && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center gap-2"
-          >
-            <div className="w-6 h-6 bg-gradient-to-br from-purple to-primary rounded-full flex items-center justify-center">
-              <Bot size={14} />
-            </div>
-            <div className="bg-dark-700 rounded-2xl px-4 py-3 rounded-bl-md">
-              <div className="flex gap-1">
-                <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-              </div>
-            </div>
-          </motion.div>
-        )}
-        
-        <div ref={messagesEndRef} />
+               </motion.div>
+             )}
+           </AnimatePresence>
+
+           <div className="relative">
+             <input
+               type="text"
+               value={input}
+               onChange={(e) => setInput(e.target.value)}
+               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+               placeholder="Posez une question sur votre système de sécurité..."
+               className="w-full bg-dark-950 border border-dark-700 rounded-xl pl-4 pr-12 py-3 focus:outline-none focus:border-ohm-cyan/50 focus:ring-1 focus:ring-ohm-cyan/50 transition-all placeholder-gray-600 text-white"
+             />
+             <button
+               onClick={() => handleSend()}
+               disabled={!input.trim() || isTyping}
+               className="absolute right-2 top-2 p-1.5 bg-ohm-cyan text-dark-950 rounded-lg hover:bg-white hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all shadow-neon"
+             >
+               <Send size={18} />
+             </button>
+           </div>
+        </div>
       </div>
       
-      {/* Input Area */}
-      <div className="mt-4">
-        <div className="flex items-center gap-3 bg-dark-800 rounded-2xl p-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Posez votre question..."
-            className="flex-1 bg-transparent px-4 py-3 focus:outline-none"
-          />
-          <button
-            onClick={handleSend}
-            disabled={!input.trim() || isTyping}
-            className={`p-3 rounded-xl ${
-              input.trim() && !isTyping
-                ? 'bg-primary hover:bg-primary-dark text-white'
-                : 'bg-dark-700 text-gray-500'
-            }`}
-          >
-            <Send size={20} />
-          </button>
-        </div>
-        
-        <p className="text-xs text-gray-600 text-center mt-2">
-          L'IA peut faire des erreurs. Vérifiez les informations importantes.
-        </p>
+      {/* Right Sidebar - Context & Status */}
+      <div className="w-80 hidden lg:flex flex-col gap-4">
+         <div className="glass-card p-4">
+            <h3 className="font-bold mb-4 flex items-center gap-2 text-sm text-gray-300">
+               <Activity size={16} className="text-ohm-cyan" />
+               ÉTAT DU SYSTÈME
+            </h3>
+            <div className="space-y-4">
+               <div>
+                  <div className="flex justify-between text-xs mb-1">
+                     <span className="text-gray-500">Charge CPU IA</span>
+                     <span className="text-ohm-cyan font-mono">42%</span>
+                  </div>
+                  <div className="h-1.5 bg-dark-700 rounded-full overflow-hidden">
+                     <div className="h-full bg-ohm-cyan w-[42%] shadow-[0_0_10px_#00f0ff]"></div>
+                  </div>
+               </div>
+               <div>
+                  <div className="flex justify-between text-xs mb-1">
+                     <span className="text-gray-500">Bande Passante</span>
+                     <span className="text-ohm-blue font-mono">24 MB/s</span>
+                  </div>
+                  <div className="h-1.5 bg-dark-700 rounded-full overflow-hidden">
+                     <div className="h-full bg-ohm-blue w-[65%]"></div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         
+         <div className="glass-card p-4 flex-1">
+            <h3 className="font-bold mb-4 flex items-center gap-2 text-sm text-gray-300">
+               <Sparkles size={16} className="text-ohm-purple" />
+               SUGGESTIONS
+            </h3>
+            <div className="space-y-3">
+               {["Optimiser caméra #04", "Vérifier logs d'hier soir", "Exporter incident 22h30"].map((item, i) => (
+                  <div key={i} className="p-3 bg-white/5 rounded-lg text-xs hover:bg-white/10 cursor-pointer border border-transparent hover:border-white/10 transition-colors">
+                     {item}
+                  </div>
+               ))}
+            </div>
+         </div>
       </div>
     </div>
   );

@@ -7,6 +7,8 @@ import AppLayout from './components/layout/AppLayout';
 import AuthLayout from './components/layout/AuthLayout';
 
 // Pages
+import LandingPage from './pages/LandingPage';
+import { GDPRPage, LegalMentionsPage, PrivacyPage, CGUPage, CGVPage, ContractPolicyPage } from './pages/LegalPages';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Cameras from './pages/Cameras';
@@ -83,6 +85,15 @@ function App() {
 
   return (
     <Routes>
+      {/* Landing Page (Public) */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/legal/gdpr" element={<GDPRPage />} />
+      <Route path="/legal/mentions" element={<LegalMentionsPage />} />
+      <Route path="/legal/privacy" element={<PrivacyPage />} />
+      <Route path="/legal/cgu" element={<CGUPage />} />
+      <Route path="/legal/cgv" element={<CGVPage />} />
+      <Route path="/legal/contract" element={<ContractPolicyPage />} />
+      
       {/* Setup route (accessible manuellement) */}
       <Route path="/setup" element={<SetupWizard onComplete={handleSetupComplete} />} />
       
@@ -97,7 +108,7 @@ function App() {
           <AppLayout />
         </ProtectedRoute>
       }>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/executive" element={<ExecutiveDashboard />} />
         <Route path="/cameras" element={<Cameras />} />

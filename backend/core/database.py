@@ -35,3 +35,6 @@ async def get_db():
             raise
         finally:
             await session.close()
+
+# Alias for Health Check Service
+get_async_session = get_db
