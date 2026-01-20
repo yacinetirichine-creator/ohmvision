@@ -3,7 +3,7 @@
  * Statistiques temps réel avec graphiques animés et design glassmorphism
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Users, Car, HardHat, AlertTriangle, TrendingUp,
   TrendingDown, Activity, Eye,
@@ -58,19 +58,22 @@ const StatCard = ({
   unit = '',
   animate = true 
 }) => {
+  const previousValueRef = useRef(0);
   const [displayValue, setDisplayValue] = useState(0);
   
   // Animate counter
   useEffect(() => {
     if (!animate) {
       setDisplayValue(value);
+      previousValueRef.current = value;
       return;
     }
     
     const duration = 500;
     const steps = 20;
-    const increment = (value - displayValue) / steps;
-    let current = displayValue;
+    const start = previousValueRef.current;
+    const increment = (value - start) / steps;
+    let current = start;
     let step = 0;
     
     const timer = setInterval(() => {
@@ -80,12 +83,13 @@ const StatCard = ({
       
       if (step >= steps) {
         setDisplayValue(value);
+        previousValueRef.current = value;
         clearInterval(timer);
       }
     }, duration / steps);
     
     return () => clearInterval(timer);
-  }, [value]);
+  }, [value, animate]);
 
   const colorClasses = {
     primary: 'from-indigo-500/20 to-purple-500/20 border-indigo-500/30',

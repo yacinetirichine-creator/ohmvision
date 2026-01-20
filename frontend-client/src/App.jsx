@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './services/store';
 import { useTranslation } from 'react-i18next';
@@ -29,7 +29,7 @@ const ProtectedRoute = ({ children }) => {
   
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [checkAuth]);
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -43,11 +43,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
 
-  useEffect(() => {
-    checkSetupStatus();
-  }, []);
-
-  const checkSetupStatus = async () => {
+  const checkSetupStatus = useCallback(async () => {
     try {
       const response = await fetch('/api/setup/status');
       const data = await response.json();
@@ -61,7 +57,11 @@ function App() {
       setShowSetup(false);
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    checkSetupStatus();
+  }, [checkSetupStatus]);
 
   const handleSetupComplete = () => {
     setShowSetup(false);

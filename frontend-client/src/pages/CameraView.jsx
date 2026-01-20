@@ -46,7 +46,7 @@ const CameraView = () => {
   useEffect(() => {
     getCamera(id);
     fetchAlerts({ camera_id: id, limit: 20 });
-  }, [id]);
+  }, [fetchAlerts, getCamera, id]);
   
   useEffect(() => {
     if (selectedCamera?.detection_config) {

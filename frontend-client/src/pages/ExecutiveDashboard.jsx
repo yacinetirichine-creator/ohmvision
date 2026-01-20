@@ -3,7 +3,7 @@
  * Tableau de bord exécutif avec KPIs et insights IA
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   TrendingUp, TrendingDown, AlertTriangle, Users, Shield, 
@@ -19,11 +19,7 @@ const ExecutiveDashboard = () => {
   const [_trends, setTrends] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, [period]);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     setLoading(true);
     try {
       const [kpisRes, trendsRes] = await Promise.all([
@@ -37,7 +33,11 @@ const ExecutiveDashboard = () => {
       console.error('Error fetching dashboard data:', err);
     }
     setLoading(false);
-  };
+  }, [period]);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   if (loading) {
     return (

@@ -314,7 +314,7 @@ export default function Cameras() {
   
   useEffect(() => {
     fetchCameras();
-  }, []);
+  }, [fetchCameras]);
   
   // Filter cameras
   const filteredCameras = cameras.filter((camera) => {

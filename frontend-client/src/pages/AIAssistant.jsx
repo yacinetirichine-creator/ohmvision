@@ -28,7 +28,9 @@ const AIAssistant = () => {
   useEffect(() => {
     fetchCameras();
     getSuggestions();
-    
+  }, [fetchCameras, getSuggestions]);
+
+  useEffect(() => {
     // Simulate AI "Thinking" pulse
     const interval = setInterval(() => {
         setAudioInputLevel(Math.random() * 100);

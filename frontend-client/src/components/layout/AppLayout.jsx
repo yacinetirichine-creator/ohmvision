@@ -24,9 +24,9 @@ const AppLayout = () => {
     fetchAlerts({ limit: 50 });
     const interval = setInterval(() => fetchAlerts({ limit: 50 }), 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchAlerts]);
   
-  useEffect(() => { closeSidebar(); }, [location.pathname]);
+  useEffect(() => { closeSidebar(); }, [closeSidebar, location.pathname]);
   
   const navItems = [
     { path: '/dashboard', icon: LayoutDashboard, label: t('nav.dashboard') },

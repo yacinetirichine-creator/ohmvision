@@ -3,7 +3,7 @@
  * Assistant de configuration première installation
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 // ============================================================================
@@ -38,12 +38,7 @@ export default function SetupWizard({ onComplete }) {
     password: ''
   });
 
-  // Vérifier l'état initial
-  useEffect(() => {
-    checkSetupStatus();
-  }, []);
-
-  const checkSetupStatus = async () => {
+  const checkSetupStatus = useCallback(async () => {
     try {
       const response = await fetch('/api/setup/status');
       const data = await response.json();
@@ -59,7 +54,12 @@ export default function SetupWizard({ onComplete }) {
       console.error('Error checking setup status:', err);
       setLoading(false);
     }
-  };
+  }, [onComplete]);
+
+  // Vérifier l'état initial
+  useEffect(() => {
+    checkSetupStatus();
+  }, [checkSetupStatus]);
 
   // Steps du wizard
   const steps = [

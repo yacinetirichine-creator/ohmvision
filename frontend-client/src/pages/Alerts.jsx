@@ -30,7 +30,7 @@ const Alerts = () => {
   useEffect(() => {
     fetchAlerts({ limit: 100 });
     fetchCameras();
-  }, []);
+  }, [fetchAlerts, fetchCameras]);
   
   // Filter alerts
   const filteredAlerts = alerts.filter(alert => {

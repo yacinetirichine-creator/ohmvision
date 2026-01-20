@@ -3,7 +3,7 @@
  * Composant de streaming vidéo MJPEG
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Camera, WifiOff, RefreshCw, Loader } from 'lucide-react';
 
 /**
@@ -49,18 +49,7 @@ const LiveStream = ({
     };
   }, []);
 
-  // Démarrage automatique
-  useEffect(() => {
-    if (autoStart && cameraId && rtspUrl) {
-      startStream();
-    }
-    
-    return () => {
-      // Cleanup si nécessaire
-    };
-  }, [cameraId, rtspUrl, autoStart]);
-
-  const startStream = async () => {
+  const startStream = useCallback(async () => {
     setStatus('loading');
     setError(null);
 
@@ -98,7 +87,18 @@ const LiveStream = ({
       setStatus('error');
       onError?.(err);
     }
-  };
+  }, [cameraId, rtspUrl, name, onError]);
+
+  // Démarrage automatique
+  useEffect(() => {
+    if (autoStart && cameraId && rtspUrl) {
+      startStream();
+    }
+    
+    return () => {
+      // Cleanup si nécessaire
+    };
+  }, [autoStart, cameraId, rtspUrl, startStream]);
 
   const _stopStream = async () => {
     try {

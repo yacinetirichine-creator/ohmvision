@@ -27,11 +27,7 @@ const Analytics = () => {
     fetchCameras();
     fetchTrends(period);
     fetchCounting();
-  }, []);
-  
-  useEffect(() => {
-    fetchTrends(period);
-  }, [period]);
+  }, [fetchCameras, fetchCounting, fetchDashboard, fetchTrends, period]);
   
   // Sample data for charts
   const hourlyData = Array.from({ length: 24 }, (_, i) => ({

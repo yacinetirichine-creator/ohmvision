@@ -230,7 +230,7 @@ export default function Dashboard() {
     if (!hasSeenTutorial) {
         setTimeout(() => setShowTutorial(true), 1500);
     }
-  }, []);
+  }, [fetchAlerts, fetchCameras, fetchDashboard]);
 
   const closeTutorial = () => {
       setShowTutorial(false);
