@@ -29,6 +29,10 @@ jobs:
         working-directory: frontend-client
         run: npm ci
 
+      - name: Security audit (high+)
+        working-directory: frontend-client
+        run: npm audit --audit-level=high
+
       - name: Lint
         working-directory: frontend-client
         run: npm run lint
