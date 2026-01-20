@@ -54,6 +54,46 @@ class DeploymentType(str, enum.Enum):
     ON_PREMISE = "on_premise"
     HYBRID = "hybrid"
 
+class ConnectionType(str, enum.Enum):
+    """Types de connexion caméra supportés"""
+    RTSP = "rtsp"
+    RTMP = "rtmp"
+    ONVIF = "onvif"
+    HTTP_MJPEG = "http_mjpeg"
+    HTTPS = "https"
+    WEBRTC = "webrtc"
+    HLS = "hls"
+    CLOUD_API = "cloud_api"
+    WEBHOOK = "webhook"
+    NVR_DVR = "nvr_dvr"
+    USB = "usb"
+    FILE = "file"
+
+class CameraManufacturer(str, enum.Enum):
+    """Fabricants de caméras supportés"""
+    HIKVISION = "hikvision"
+    DAHUA = "dahua"
+    AXIS = "axis"
+    FOSCAM = "foscam"
+    VIVOTEK = "vivotek"
+    BOSCH = "bosch"
+    SAMSUNG = "samsung"
+    SONY = "sony"
+    PANASONIC = "panasonic"
+    MOBOTIX = "mobotix"
+    AVIGILON = "avigilon"
+    HANWHA = "hanwha"
+    UNIVIEW = "uniview"
+    TP_LINK = "tplink"
+    XIAOMI = "xiaomi"
+    NEST = "nest"
+    RING = "ring"
+    ARLO = "arlo"
+    WYZE = "wyze"
+    REOLINK = "reolink"
+    GENERIC = "generic"
+    OTHER = "other"
+
 # =============================================================================
 # USERS & AUTH
 # =============================================================================
@@ -198,17 +238,48 @@ class Camera(Base):
     description = Column(Text)
     location = Column(String(255))
     
-    # Connection
+    # Manufacturer Info
+    manufacturer = Column(Enum(CameraManufacturer), default=CameraManufacturer.GENERIC)
+    model = Column(String(100))
+    firmware_version = Column(String(50))
+    serial_number = Column(String(100))
+    
+    # Connection Type
+    connection_type = Column(Enum(ConnectionType), default=ConnectionType.RTSP)
+    primary_stream_url = Column(String(500))  # URL principale (RTSP, HTTP, etc.)
+    secondary_stream_url = Column(String(500))  # Stream secondaire (basse qualité)
+    snapshot_url = Column(String(500))  # URL pour snapshot
+    
+    # Legacy fields (compatibilité)
     rtsp_url = Column(String(500))
     ip_address = Column(String(50))
     port = Column(Integer, default=554)
     username = Column(String(100))
     password = Column(String(255))  # Encrypted
     
+    # Advanced Connection Settings (JSON)
+    connection_config = Column(JSON, default={
+        "protocol": "rtsp",
+        "transport": "tcp",  # tcp, udp, http
+        "timeout": 5,
+        "retry_count": 3,
+        "reconnect_delay": 10,
+        "use_hardware_acceleration": False,
+        "buffer_size": 1024
+    })
+    
+    # Cloud API Config (pour Nest, Ring, Arlo, etc.)
+    cloud_config = Column(JSON, default={})
+    
     # Status
     is_active = Column(Boolean, default=True)
     is_online = Column(Boolean, default=False)
     last_seen = Column(DateTime, nullable=True)
+    connection_health = Column(String(20), default="unknown")  # excellent, good, poor, offline
+    last_health_check = Column(DateTime, nullable=True)
+    uptime_percentage = Column(Float, default=0.0)  # % de disponibilité sur 30j
+    failed_connection_attempts = Column(Integer, default=0)
+    last_error_message = Column(Text)
     
     # Capabilities
     resolution_width = Column(Integer)

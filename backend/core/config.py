@@ -17,8 +17,12 @@ class Settings(BaseSettings):
     SUPABASE_URL: str = ""
     SUPABASE_ANON_KEY: str = ""
     
-    # Database
-    DATABASE_URL: str = "postgresql+asyncpg://ohmvision:ohmvision_secret@localhost:5432/ohmvision"
+    # Database - Automatique depuis variable d'environnement
+    # Local: SQLite / Production: Supabase PostgreSQL depuis RAILWAY
+    DATABASE_URL: str = os.getenv(
+        "DATABASE_URL",
+        "sqlite+aiosqlite:///./ohmvision.db"  # Fallback pour développement local
+    )
     
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"

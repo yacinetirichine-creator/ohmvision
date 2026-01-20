@@ -18,7 +18,9 @@ from api.discovery import router as discovery_router
 from api.setup import router as setup_router
 from api.streaming import router as streaming_router
 from api.advanced_analytics import router as advanced_router
+from api.health import router as health_router
 from api import gdpr
+from services.health_check_service import start_health_check_service, stop_health_check_service
 
 # Lifespan pour init/cleanup
 @asynccontextmanager
@@ -28,8 +30,17 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     print("✅ Base de données initialisée")
+    
+    # Démarrer le service de health check
+    print("🏥 Démarrage du service Health Check...")
+    await start_health_check_service()
+    print("✅ Service Health Check démarré")
+    
     yield
+    
     # Shutdown
+    print("🏥 Arrêt du service Health Check...")
+    await stop_health_check_service()
     print("👋 Arrêt OhmVision API...")
 
 # Application FastAPI
@@ -75,6 +86,7 @@ app.include_router(discovery_router)  # Déjà préfixé /api/discovery
 app.include_router(setup_router)  # Déjà préfixé /api/setup
 app.include_router(streaming_router)  # Déjà préfixé /api/streaming
 app.include_router(advanced_router)  # Déjà préfixé /api/advanced
+app.include_router(health_router)  # Déjà préfixé /api/health
 
 # Health check
 @app.get("/health")

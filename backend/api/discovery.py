@@ -1,6 +1,7 @@
 """
 OhmVision - API de découverte de caméras
 Endpoints pour scanner le réseau et découvrir les caméras
+Supporte: ONVIF, RTSP, HTTP, Auto-détection multi-canal
 """
 
 from fastapi import APIRouter, HTTPException, BackgroundTasks
@@ -13,6 +14,8 @@ import logging
 from services.network_scanner import NetworkScanner, NetworkDevice
 from services.onvif_scanner import ONVIFScanner, ONVIFCamera
 from services.rtsp_tester import RTSPTester, RTSPStreamInfo
+from services.multi_channel_connector import MultiChannelConnector, test_camera_connectivity, batch_test_cameras
+from services.camera_profiles import get_all_manufacturers, get_profile, auto_detect_stream_urls
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +88,45 @@ class CameraCredentials(BaseModel):
     username: str = "admin"
     password: str = ""
     manufacturer: Optional[str] = None
+
+
+class AutoDetectRequest(BaseModel):
+    """Requête pour auto-détection complète"""
+    ip: str
+    username: str = "admin"
+    password: str = ""
+    manufacturer: Optional[str] = None
+    test_all_methods: bool = True  # Tester toutes les méthodes ou s'arrêter au premier succès
+
+
+class ConnectionTestResult(BaseModel):
+    """Résultat de test de connexion"""
+    success: bool
+    connection_type: str
+    url: str
+    response_time_ms: float
+    resolution: Optional[str] = None
+    fps: Optional[float] = None
+    codec: Optional[str] = None
+    error_message: Optional[str] = None
+
+
+class AutoDetectResponse(BaseModel):
+    """Réponse d'auto-détection"""
+    success: bool
+    recommended_method: Optional[str] = None
+    recommended_url: Optional[str] = None
+    all_results: List[ConnectionTestResult] = []
+    manufacturer_detected: Optional[str] = None
+
+
+class ManufacturerInfo(BaseModel):
+    """Informations sur un fabricant"""
+    id: str
+    name: str
+    default_port: int
+    onvif_supported: bool
+    capabilities: List[str]
 
 
 class NetworkInfo(BaseModel):
@@ -284,6 +326,139 @@ async def auto_discover_rtsp(credentials: CameraCredentials):
 async def get_common_rtsp_paths():
     """Retourne les chemins RTSP communs par fabricant"""
     return RTSPTester.RTSP_PATHS
+
+
+@router.get("/manufacturers", response_model=List[ManufacturerInfo])
+async def list_manufacturers():
+    """
+    Liste tous les fabricants de caméras supportés avec leurs profils
+    """
+    manufacturers = get_all_manufacturers()
+    return [ManufacturerInfo(**m) for m in manufacturers]
+
+
+@router.post("/auto-detect", response_model=AutoDetectResponse)
+async def auto_detect_camera(request: AutoDetectRequest):
+    """
+    🚀 AUTO-DÉTECTION INTELLIGENTE MULTI-CANAL
+    
+    Teste automatiquement toutes les méthodes de connexion disponibles :
+    - RTSP (avec templates par fabricant)
+    - HTTP/MJPEG
+    - ONVIF
+    - Snapshot URLs
+    
+    Retourne la meilleure méthode détectée avec tous les résultats
+    """
+    try:
+        # Tester la connectivité
+        result = await test_camera_connectivity(
+            ip=request.ip,
+            username=request.username,
+            password=request.password,
+            manufacturer=request.manufacturer
+        )
+        
+        # Formater les résultats
+        all_results = []
+        for test in result.get("all_tests", []):
+            all_results.append(ConnectionTestResult(
+                success=test.get("success", False),
+                connection_type=test.get("connection_type", "unknown"),
+                url=test.get("url", ""),
+                response_time_ms=test.get("response_time_ms", 0),
+                resolution=f"{test['resolution'][0]}x{test['resolution'][1]}" if test.get("resolution") else None,
+                fps=test.get("fps"),
+                codec=test.get("codec"),
+                error_message=test.get("error_message")
+            ))
+        
+        return AutoDetectResponse(
+            success=result.get("success", False),
+            recommended_method=result.get("recommended_type"),
+            recommended_url=result.get("recommended_url"),
+            all_results=all_results,
+            manufacturer_detected=request.manufacturer
+        )
+        
+    except Exception as e:
+        logger.error(f"Auto-detect error for {request.ip}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/batch-test")
+async def batch_test_cameras_endpoint(cameras: List[CameraCredentials]):
+    """
+    Teste plusieurs caméras en parallèle
+    Utile pour valider une liste de caméras rapidement
+    """
+    try:
+        camera_list = [
+            {
+                "ip": cam.ip,
+                "username": cam.username,
+                "password": cam.password,
+                "manufacturer": cam.manufacturer
+            }
+            for cam in cameras
+        ]
+        
+        results = await batch_test_cameras(camera_list)
+        
+        return {
+            "total": len(cameras),
+            "successful": sum(1 for r in results if r["success"]),
+            "failed": sum(1 for r in results if not r["success"]),
+            "results": results
+        }
+        
+    except Exception as e:
+        logger.error(f"Batch test error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/stream-templates/{manufacturer}")
+async def get_stream_templates(manufacturer: str):
+    """
+    Récupère les templates d'URL de stream pour un fabricant
+    """
+    profile = get_profile(manufacturer)
+    
+    if not profile:
+        raise HTTPException(status_code=404, detail="Manufacturer not found")
+    
+    return {
+        "manufacturer": profile.manufacturer,
+        "rtsp_templates": profile.rtsp_templates,
+        "http_templates": profile.http_templates,
+        "snapshot_templates": profile.snapshot_templates,
+        "default_port": profile.default_port,
+        "default_username": profile.default_username,
+        "onvif_supported": profile.onvif_supported,
+        "capabilities": profile.capabilities
+    }
+
+
+@router.post("/generate-urls")
+async def generate_camera_urls(request: CameraCredentials):
+    """
+    Génère toutes les URLs possibles pour une caméra
+    sans les tester (pour inspection manuelle)
+    """
+    urls = auto_detect_stream_urls(
+        ip=request.ip,
+        username=request.username,
+        password=request.password,
+        manufacturer=request.manufacturer
+    )
+    
+    return {
+        "ip": request.ip,
+        "manufacturer": request.manufacturer or "generic",
+        "rtsp_urls": urls.get("rtsp", []),
+        "http_urls": urls.get("http", []),
+        "snapshot_urls": urls.get("snapshot", [])
+    }
 
 
 # ============================================================================
