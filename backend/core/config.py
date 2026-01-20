@@ -3,7 +3,7 @@ OhmVision - Configuration
 """
 
 from pydantic_settings import BaseSettings
-from typing import List
+from typing import List, Optional
 import os
 
 class Settings(BaseSettings):
@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     
     # CORS - Accepte soit une liste JSON soit une chaîne séparée par des virgules
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:3001,http://localhost:5173,http://localhost:8080"
+
+    # Optionnel: regex d'origines autorisées (utile pour les URLs preview Vercel)
+    # Exemple: https://.*\\.vercel\\.app$
+    CORS_ORIGIN_REGEX: Optional[str] = None
     
     def get_cors_origins(self) -> List[str]:
         """Parse CORS_ORIGINS correctement depuis .env"""
