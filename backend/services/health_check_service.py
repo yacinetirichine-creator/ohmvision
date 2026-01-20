@@ -102,7 +102,10 @@ class HealthCheckService:
     
     async def _perform_health_checks(self):
         """Effectue les vérifications de santé"""
-        from core.database import get_async_session
+        try:
+            from core.database import get_async_session
+        except ImportError:  # compat: anciens builds
+            from core.database import get_db as get_async_session
         
         async for db in get_async_session():
             try:
@@ -286,7 +289,10 @@ class HealthCheckService:
     
     async def get_camera_health(self, camera_id: int) -> Optional[CameraHealthStatus]:
         """Récupère le statut de santé d'une caméra"""
-        from core.database import get_async_session
+        try:
+            from core.database import get_async_session
+        except ImportError:  # compat: anciens builds
+            from core.database import get_db as get_async_session
         
         async for db in get_async_session():
             try:
@@ -321,7 +327,10 @@ class HealthCheckService:
     
     async def get_all_health_status(self) -> List[CameraHealthStatus]:
         """Récupère le statut de santé de toutes les caméras"""
-        from core.database import get_async_session
+        try:
+            from core.database import get_async_session
+        except ImportError:  # compat: anciens builds
+            from core.database import get_db as get_async_session
         
         async for db in get_async_session():
             try:

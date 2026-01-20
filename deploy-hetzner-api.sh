@@ -151,7 +151,8 @@ chmod 600 .env
 
 mkdir -p uploads logs logs/nginx
 
-# Inject domain placeholder in nginx config
+# Phase 1: nginx HTTP-only (permet l'ACME challenge)
+cp docker/nginx-api.http.conf docker/nginx-api.conf
 sed -i "s/__DOMAIN__/$API_DOMAIN/g" docker/nginx-api.conf
 
 # Start nginx + certbot for initial challenge
@@ -171,6 +172,11 @@ docker compose -f "$COMPOSE_FILE" exec -T certbot certbot certonly \
   --agree-tos \
   --no-eff-email \
   -d $API_DOMAIN
+
+# Phase 2: activer HTTPS (certificat maintenant présent)
+cp docker/nginx-api.https.conf docker/nginx-api.conf
+sed -i "s/__DOMAIN__/$API_DOMAIN/g" docker/nginx-api.conf
+docker compose -f "$COMPOSE_FILE" restart nginx
 
 # Restart full stack
 docker compose -f "$COMPOSE_FILE" up -d --build
