@@ -5,17 +5,20 @@
 import React, { useEffect } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard, Camera, Bell, BarChart3, Settings,
   Bot, Menu, X, LogOut, User, Crown, MessageSquare
 } from 'lucide-react';
 import { useAuthStore, useAlertsStore, useUIStore } from '../../services/store';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 const AppLayout = () => {
   const location = useLocation();
   const { user, logout } = useAuthStore();
   const { unreadCount, fetchAlerts } = useAlertsStore();
   const { sidebarOpen, toggleSidebar, closeSidebar } = useUIStore();
+  const { t } = useTranslation();
   
   useEffect(() => {
     fetchAlerts({ limit: 50 });
@@ -26,14 +29,14 @@ const AppLayout = () => {
   useEffect(() => { closeSidebar(); }, [location.pathname]);
   
   const navItems = [
-    { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/executive', icon: Crown, label: 'Exécutif' },
-    { path: '/cameras', icon: Camera, label: 'Caméras' },
-    { path: '/alerts', icon: Bell, label: 'Alertes', badge: unreadCount },
-    { path: '/analytics', icon: BarChart3, label: 'Analytics' },
-    { path: '/ai', icon: Bot, label: 'Assistant IA' },
-    { path: '/notifications', icon: MessageSquare, label: 'Notifications' },
-    { path: '/settings', icon: Settings, label: 'Paramètres' },
+    { path: '/', icon: LayoutDashboard, label: t('nav.dashboard') },
+    { path: '/executive', icon: Crown, label: t('nav.executive') },
+    { path: '/cameras', icon: Camera, label: t('nav.cameras') },
+    { path: '/alerts', icon: Bell, label: t('nav.alerts'), badge: unreadCount },
+    { path: '/analytics', icon: BarChart3, label: t('nav.analytics') },
+    { path: '/ai', icon: Bot, label: t('nav.aiAssistant') },
+    { path: '/notifications', icon: MessageSquare, label: t('nav.notifications') },
+    { path: '/settings', icon: Settings, label: t('nav.settings') },
   ];
   
   return (
@@ -62,9 +65,12 @@ const AppLayout = () => {
               <span className="text-xl">👁️</span>
             </div>
             <div>
-              <h1 className="font-bold text-lg">OhmVision</h1>
+              <h1 className="font-bold text-lg">{t('common.brand')}</h1>
               <span className="text-xs text-gray-500">v1.0.0</span>
             </div>
+          </div>
+          <div className="hidden lg:block">
+            <LanguageSwitcher />
           </div>
           <button onClick={closeSidebar} className="lg:hidden p-2 hover:bg-dark-700 rounded-lg">
             <X size={20} />
@@ -117,12 +123,15 @@ const AppLayout = () => {
           </button>
           <div className="flex items-center gap-2">
             <span className="text-xl">👁️</span>
-            <span className="font-bold">OhmVision</span>
+            <span className="font-bold">{t('common.brand')}</span>
           </div>
-          <NavLink to="/alerts" className="relative p-2 hover:bg-dark-700 rounded-lg">
-            <Bell size={24} />
-            {unreadCount > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full" />}
-          </NavLink>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher className="sm:mr-1" />
+            <NavLink to="/alerts" className="relative p-2 hover:bg-dark-700 rounded-lg">
+              <Bell size={24} />
+              {unreadCount > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full" />}
+            </NavLink>
+          </div>
         </header>
         
         <div className="flex-1 overflow-y-auto p-4 lg:p-6 safe-area-bottom">

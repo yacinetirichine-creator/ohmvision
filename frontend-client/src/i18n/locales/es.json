@@ -1,0 +1,89 @@
+{
+  "common": {
+    "brand": "OhmVision",
+    "loading": "Cargando OhmVision...",
+    "language": "Idioma",
+    "languages": {
+      "fr": "Francés",
+      "en": "Inglés",
+      "es": "Español"
+    }
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "executive": "Ejecutivo",
+    "cameras": "Cámaras",
+    "alerts": "Alertas",
+    "analytics": "Analíticas",
+    "aiAssistant": "Asistente IA",
+    "notifications": "Notificaciones",
+    "settings": "Ajustes"
+  },
+  "landing": {
+    "nav": {
+      "features": "Funciones",
+      "security": "Seguridad IA",
+      "pricing": "Planes",
+      "login": "Iniciar sesión",
+      "start": "Empezar",
+      "officialSite": "OhmTronic.fr"
+    },
+    "hero": {
+      "badge": "Nueva Generación v3.0",
+      "titleLine1": "Videovigilancia",
+      "titleHighlight": "Inteligente y Autónoma",
+      "subtitle": "Convierte tus cámaras en agentes de seguridad proactivos gracias a nuestra IA neuronal. Detección de anomalías, análisis térmico y alertas en tiempo real en una interfaz futurista.",
+      "ctaDemo": "Iniciar demo",
+      "ctaTutorial": "Ver tutorial",
+      "kpi1": "99,9% Uptime",
+      "kpi2": "Cumple RGPD",
+      "kpi3": "IA en el dispositivo",
+      "aiCoreStatus": "ESTADO DEL NÚCLEO IA",
+      "aiActive": "ACTIVO"
+    },
+    "features": {
+      "title": "Tecnología",
+      "titleAccent": "Supervisada",
+      "subtitle": "Un conjunto de herramientas avanzadas para una seguridad sin fricción.",
+      "card1Title": "Análisis IA en tiempo real",
+      "card1Desc": "Algoritmos predictivos que detectan intrusiones, incendios y comportamientos sospechosos al instante.",
+      "card2Title": "Panel fluido",
+      "card2Desc": "Interfaz ultra reactiva diseñada para decidir de inmediato, sin latencia.",
+      "card3Title": "Seguridad Zero-Trust",
+      "card3Desc": "Cifrado extremo a extremo y autenticación fuerte para proteger tus flujos de vídeo."
+    },
+    "tutorial": {
+      "title": "Empieza en 2 minutos",
+      "subtitle": "Descubre cómo OhmVision simplifica tu seguridad con nuestra guía interactiva.",
+      "step1": "1. Instalación",
+      "step2": "2. Conectar cámara",
+      "step3": "3. Configurar IA",
+      "step4": "4. Monitorización"
+    },
+    "newsletter": {
+      "title": "Conéctate al futuro",
+      "subtitle": "Recibe nuestras últimas novedades, tutoriales exclusivos y noticias de seguridad con IA.",
+      "emailPlaceholder": "tu@email.com",
+      "join": "Unirme",
+      "thanks": "¡Gracias! Ya estás suscrito al boletín de OhmVision."
+    },
+    "footer": {
+      "copyright": "© 2026 OhmTronic. Todos los derechos reservados.",
+      "officialSite": "Sitio oficial",
+      "privacy": "Política de privacidad",
+      "gdpr": "Cumplimiento RGPD",
+      "mentions": "Aviso legal"
+    }
+  },
+  "legal": {
+    "backHome": "Volver al inicio",
+    "links": {
+      "mentions": "Aviso legal",
+      "privacy": "Privacidad",
+      "cgu": "Condiciones de uso",
+      "cgv": "Condiciones de venta",
+      "gdpr": "RGPD"
+    },
+    "noticeFrenchOnly": "Nota: por precisión jurídica, la versión en francés es la que prevalece. Las traducciones al inglés y al español pueden añadirse bajo demanda mediante un traductor jurídico."
+  }
+}

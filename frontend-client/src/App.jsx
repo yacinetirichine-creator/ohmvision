@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useAuthStore } from './services/store';
+import { useTranslation } from 'react-i18next';
 
 // Layouts
 import AppLayout from './components/layout/AppLayout';
@@ -39,6 +40,7 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   const [showSetup, setShowSetup] = useState(null); // null = loading, true = show, false = hide
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     checkSetupStatus();
@@ -72,7 +74,7 @@ function App() {
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-600">Chargement d'OhmVision...</p>
+          <p className="text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     );

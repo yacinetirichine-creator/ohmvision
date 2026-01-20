@@ -1,0 +1,89 @@
+{
+  "common": {
+    "brand": "OhmVision",
+    "loading": "Loading OhmVision...",
+    "language": "Language",
+    "languages": {
+      "fr": "French",
+      "en": "English",
+      "es": "Spanish"
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "executive": "Executive",
+    "cameras": "Cameras",
+    "alerts": "Alerts",
+    "analytics": "Analytics",
+    "aiAssistant": "AI Assistant",
+    "notifications": "Notifications",
+    "settings": "Settings"
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "security": "AI Security",
+      "pricing": "Plans",
+      "login": "Sign in",
+      "start": "Get started",
+      "officialSite": "OhmTronic.fr"
+    },
+    "hero": {
+      "badge": "Next Generation v3.0",
+      "titleLine1": "AI-powered",
+      "titleHighlight": "Smart & Autonomous Surveillance",
+      "subtitle": "Turn your cameras into proactive security agents with our neural AI. Anomaly detection, thermal insights, and real-time alerts — all in a futuristic interface.",
+      "ctaDemo": "Launch Demo",
+      "ctaTutorial": "Watch Tutorial",
+      "kpi1": "99.9% Uptime",
+      "kpi2": "GDPR Compliant",
+      "kpi3": "On-device AI",
+      "aiCoreStatus": "AI CORE STATUS",
+      "aiActive": "ACTIVE"
+    },
+    "features": {
+      "title": "Supervised",
+      "titleAccent": "Technology",
+      "subtitle": "A suite of advanced tools for frictionless security operations.",
+      "card1Title": "Real-time AI Analytics",
+      "card1Desc": "Predictive algorithms that detect intrusions, fires, and suspicious behaviors instantly.",
+      "card2Title": "Fluid Dashboard",
+      "card2Desc": "Ultra-responsive interface designed for immediate decision-making — no latency.",
+      "card3Title": "Zero-Trust Security",
+      "card3Desc": "End-to-end encryption and strong authentication to protect your video streams."
+    },
+    "tutorial": {
+      "title": "Get started in 2 minutes",
+      "subtitle": "See how OhmVision simplifies security with our interactive guide.",
+      "step1": "1. Install",
+      "step2": "2. Connect Camera",
+      "step3": "3. Configure AI",
+      "step4": "4. Monitoring"
+    },
+    "newsletter": {
+      "title": "Stay connected to the future",
+      "subtitle": "Get our latest updates, exclusive tutorials, and AI-security news.",
+      "emailPlaceholder": "you@email.com",
+      "join": "Join",
+      "thanks": "Thanks! You're subscribed to the OhmVision newsletter."
+    },
+    "footer": {
+      "copyright": "© 2026 OhmTronic. All rights reserved.",
+      "officialSite": "Official website",
+      "privacy": "Privacy Policy",
+      "gdpr": "GDPR Compliance",
+      "mentions": "Legal Notice"
+    }
+  },
+  "legal": {
+    "backHome": "Back to home",
+    "links": {
+      "mentions": "Legal Notice",
+      "privacy": "Privacy",
+      "cgu": "Terms of Use",
+      "cgv": "Terms of Sale",
+      "gdpr": "GDPR"
+    },
+    "noticeFrenchOnly": "Note: for legal accuracy, the French version is authoritative. English and Spanish translations can be added on request via a legal translator."
+  }
+}

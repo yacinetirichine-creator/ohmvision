@@ -12,18 +12,21 @@ import {
   FiMail, FiPhone, FiMapPin, FiChevronDown, FiChevronUp
 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // COMPOSANT LAYOUT COMMUN
 // ============================================
 const LegalLayout = ({ title, icon: Icon, lastUpdate, children }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-dark-950 text-gray-300 font-sans">
       {/* Navigation */}
       <nav className="fixed w-full z-50 glass-panel border-b border-white/5 py-4 px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 text-ohm-cyan hover:text-white transition-colors">
-            <FiArrowLeft /> Retour à l'accueil
+            <FiArrowLeft /> {t('legal.backHome')}
           </Link>
           <div className="font-bold text-white">OHM<span className="text-ohm-cyan">VISION</span></div>
         </div>
@@ -62,6 +65,9 @@ const LegalLayout = ({ title, icon: Icon, lastUpdate, children }) => {
             prose-th:bg-white/5 prose-th:px-4 prose-th:py-2 prose-th:text-left
             prose-td:px-4 prose-td:py-2 prose-td:border-t prose-td:border-white/5"
           >
+            <div className="bg-white/5 rounded-xl p-4 mb-6 text-sm text-gray-300">
+              {t('legal.noticeFrenchOnly')}
+            </div>
             {children}
           </div>
         </motion.div>
@@ -70,11 +76,11 @@ const LegalLayout = ({ title, icon: Icon, lastUpdate, children }) => {
         <div className="text-center text-sm text-gray-500 mt-8">
           <p>© 2026 OhmTronic SAS - Tous droits réservés</p>
           <div className="flex flex-wrap justify-center gap-4 mt-3">
-            <Link to="/legal/mentions" className="hover:text-ohm-cyan transition-colors">Mentions Légales</Link>
-            <Link to="/legal/privacy" className="hover:text-ohm-cyan transition-colors">Confidentialité</Link>
-            <Link to="/legal/cgu" className="hover:text-ohm-cyan transition-colors">CGU</Link>
-            <Link to="/legal/cgv" className="hover:text-ohm-cyan transition-colors">CGV</Link>
-            <Link to="/legal/gdpr" className="hover:text-ohm-cyan transition-colors">RGPD</Link>
+            <Link to="/legal/mentions" className="hover:text-ohm-cyan transition-colors">{t('legal.links.mentions')}</Link>
+            <Link to="/legal/privacy" className="hover:text-ohm-cyan transition-colors">{t('legal.links.privacy')}</Link>
+            <Link to="/legal/cgu" className="hover:text-ohm-cyan transition-colors">{t('legal.links.cgu')}</Link>
+            <Link to="/legal/cgv" className="hover:text-ohm-cyan transition-colors">{t('legal.links.cgv')}</Link>
+            <Link to="/legal/gdpr" className="hover:text-ohm-cyan transition-colors">{t('legal.links.gdpr')}</Link>
           </div>
         </div>
       </main>
