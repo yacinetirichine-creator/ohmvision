@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Camera, WifiOff, RefreshCw, Loader, AlertTriangle } from 'lucide-react';
+import { Camera, WifiOff, RefreshCw, Loader } from 'lucide-react';
 
 /**
  * Composant d'affichage du flux vidéo en direct
@@ -100,7 +100,7 @@ const LiveStream = ({
     }
   };
 
-  const stopStream = async () => {
+  const _stopStream = async () => {
     try {
       await fetch(`/api/streaming/stop/${cameraId}`, { method: 'POST' });
     } catch (err) {

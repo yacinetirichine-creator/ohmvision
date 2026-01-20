@@ -5,23 +5,25 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
-  Bot, Send, Sparkles, AlertCircle, CheckCircle, Lightbulb,
-  RefreshCw, Zap, Camera, Settings, ChevronRight, MessageSquare, Activity
+  Bot, Send, Sparkles, Lightbulb,
+  RefreshCw, Zap, Settings, MessageSquare, Activity
 } from 'lucide-react';
 import { useAIStore, useCamerasStore } from '../services/store';
 
 const AIAssistant = () => {
-  const { messages, suggestions, isTyping, sendMessage, runDiagnostic, getSuggestions, clearMessages } = useAIStore();
-  const { cameras, fetchCameras } = useCamerasStore();
+  const { t } = useTranslation();
+  const { messages, suggestions: _suggestions, isTyping, sendMessage, runDiagnostic, getSuggestions, clearMessages } = useAIStore();
+  const { cameras: _cameras, fetchCameras } = useCamerasStore();
   
   const [input, setInput] = useState('');
-  const [showQuickActions, setShowQuickActions] = useState(true);
-  const [diagnosticResult, setDiagnosticResult] = useState(null);
+  const [_showQuickActions, setShowQuickActions] = useState(true);
+  const [_diagnosticResult, setDiagnosticResult] = useState(null);
   const messagesEndRef = useRef(null);
   
   // New States for Visual Effects
-  const [audioInputLevel, setAudioInputLevel] = useState(0);
+  const [_audioInputLevel, setAudioInputLevel] = useState(0);
 
   useEffect(() => {
     fetchCameras();
@@ -53,17 +55,19 @@ const AIAssistant = () => {
     
     switch (action) {
       case 'diagnostic':
-        const result = await runDiagnostic();
-        setDiagnosticResult(result);
-        break;
+        {
+          const result = await runDiagnostic();
+          setDiagnosticResult(result);
+          break;
+        }
       case 'optimize':
-        await handleSend("Optimise mes caméras pour réduire les faux positifs");
+        await handleSend(t('aiAssistant.quickActionMessages.optimize'));
         break;
       case 'report':
-        await handleSend("Génère un rapport de la semaine dernière");
+        await handleSend(t('aiAssistant.quickActionMessages.report'));
         break;
       case 'help':
-        await handleSend("Quelles sont les fonctionnalités disponibles ?");
+        await handleSend(t('aiAssistant.quickActionMessages.help'));
         break;
       default:
         await handleSend(action);
@@ -74,38 +78,38 @@ const AIAssistant = () => {
     {
       id: 'diagnostic',
       icon: Zap,
-      title: 'Diagnostic système',
-      description: 'Analyse complète de toutes les caméras',
+      title: t('aiAssistant.quickActions.diagnostic.title'),
+      description: t('aiAssistant.quickActions.diagnostic.description'),
       color: 'primary'
     },
     {
       id: 'optimize',
       icon: Settings,
-      title: 'Optimiser les détections',
-      description: 'Réduire les faux positifs automatiquement',
+      title: t('aiAssistant.quickActions.optimize.title'),
+      description: t('aiAssistant.quickActions.optimize.description'),
       color: 'purple'
     },
     {
       id: 'report',
       icon: MessageSquare,
-      title: 'Générer un rapport',
-      description: 'Rapport de la semaine dernière',
+      title: t('aiAssistant.quickActions.report.title'),
+      description: t('aiAssistant.quickActions.report.description'),
       color: 'success'
     },
     {
       id: 'help',
       icon: Lightbulb,
-      title: 'Aide & Conseils',
-      description: 'Découvrir les fonctionnalités',
+      title: t('aiAssistant.quickActions.help.title'),
+      description: t('aiAssistant.quickActions.help.description'),
       color: 'warning'
     }
   ];
   
   const suggestionMessages = [
-    "Pourquoi ma caméra Entrée est hors ligne ?",
-    "Comment configurer la détection de chute ?",
-    "Montre-moi les alertes critiques d'aujourd'hui",
-    "Quels sont les pics de fréquentation ?",
+    t('aiAssistant.suggestions.cameraOffline'),
+    t('aiAssistant.suggestions.fallConfig'),
+    t('aiAssistant.suggestions.criticalAlertsToday'),
+    t('aiAssistant.suggestions.peakTraffic'),
   ];
   
   return (
@@ -124,7 +128,7 @@ const AIAssistant = () => {
               </h2>
               <div className="flex items-center gap-1.5 text-xs text-gray-400">
                 <span className={`w-1.5 h-1.5 rounded-full ${isTyping ? 'bg-ohm-cyan animate-ping' : 'bg-green-500'}`} />
-                {isTyping ? 'Analyse en cours...' : 'Prêt à aider'}
+                {isTyping ? t('aiAssistant.status.analyzing') : t('aiAssistant.status.ready')}
               </div>
             </div>
           </div>
@@ -132,7 +136,7 @@ const AIAssistant = () => {
           <button 
             onClick={clearMessages}
             className="p-2 hover:bg-white/5 rounded-lg text-gray-400 hover:text-white transition-colors"
-            title="Effacer la conversation"
+            title={t('aiAssistant.actions.clearConversation')}
           >
             <RefreshCw size={18} />
           </button>
@@ -153,9 +157,9 @@ const AIAssistant = () => {
                     <div className="absolute inset-0 bg-ohm-cyan/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <Bot size={48} className="text-ohm-cyan/50" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Comment puis-je vous aider ?</h3>
+                <h3 className="text-xl font-bold text-white mb-2">{t('aiAssistant.empty.title')}</h3>
                 <p className="max-w-md mx-auto mb-8">
-                  Je peux analyser vos flux vidéo, optimiser les réglages de détection ou générer des rapports de sécurité.
+                  {t('aiAssistant.empty.subtitle')}
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
@@ -236,7 +240,7 @@ const AIAssistant = () => {
                value={input}
                onChange={(e) => setInput(e.target.value)}
                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-               placeholder="Posez une question sur votre système de sécurité..."
+               placeholder={t('aiAssistant.input.placeholder')}
                className="w-full bg-dark-950 border border-dark-700 rounded-xl pl-4 pr-12 py-3 focus:outline-none focus:border-ohm-cyan/50 focus:ring-1 focus:ring-ohm-cyan/50 transition-all placeholder-gray-600 text-white"
              />
              <button
@@ -255,12 +259,12 @@ const AIAssistant = () => {
          <div className="glass-card p-4">
             <h3 className="font-bold mb-4 flex items-center gap-2 text-sm text-gray-300">
                <Activity size={16} className="text-ohm-cyan" />
-               ÉTAT DU SYSTÈME
+            {t('aiAssistant.sidebar.systemStatus.title')}
             </h3>
             <div className="space-y-4">
                <div>
                   <div className="flex justify-between text-xs mb-1">
-                     <span className="text-gray-500">Charge CPU IA</span>
+                <span className="text-gray-500">{t('aiAssistant.sidebar.systemStatus.cpuLoad')}</span>
                      <span className="text-ohm-cyan font-mono">42%</span>
                   </div>
                   <div className="h-1.5 bg-dark-700 rounded-full overflow-hidden">
@@ -269,7 +273,7 @@ const AIAssistant = () => {
                </div>
                <div>
                   <div className="flex justify-between text-xs mb-1">
-                     <span className="text-gray-500">Bande Passante</span>
+                  <span className="text-gray-500">{t('aiAssistant.sidebar.systemStatus.bandwidth')}</span>
                      <span className="text-ohm-blue font-mono">24 MB/s</span>
                   </div>
                   <div className="h-1.5 bg-dark-700 rounded-full overflow-hidden">
@@ -282,10 +286,14 @@ const AIAssistant = () => {
          <div className="glass-card p-4 flex-1">
             <h3 className="font-bold mb-4 flex items-center gap-2 text-sm text-gray-300">
                <Sparkles size={16} className="text-ohm-purple" />
-               SUGGESTIONS
+            {t('aiAssistant.sidebar.suggestions.title')}
             </h3>
             <div className="space-y-3">
-               {["Optimiser caméra #04", "Vérifier logs d'hier soir", "Exporter incident 22h30"].map((item, i) => (
+            {[
+              t('aiAssistant.sidebar.suggestions.items.optimizeCamera04'),
+              t('aiAssistant.sidebar.suggestions.items.checkLastNightLogs'),
+              t('aiAssistant.sidebar.suggestions.items.exportIncident2230'),
+            ].map((item, i) => (
                   <div key={i} className="p-3 bg-white/5 rounded-lg text-xs hover:bg-white/10 cursor-pointer border border-transparent hover:border-white/10 transition-colors">
                      {item}
                   </div>

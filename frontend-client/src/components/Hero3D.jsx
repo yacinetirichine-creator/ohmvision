@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Sphere, MeshDistortMaterial, Float } from '@react-three/drei';
+import { MeshDistortMaterial, Float } from '@react-three/drei';
 
 export function Hero3D() {
   const sphereRef = useRef();

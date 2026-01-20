@@ -4,41 +4,43 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Mail, MessageCircle, Send, Webhook, Bell, Smartphone,
-  Plus, Trash2, Save, TestTube, Check, X, AlertCircle,
-  Settings, ChevronDown, ChevronUp
+  Plus, Trash2, TestTube, Check, X, ChevronDown, ChevronUp
 } from 'lucide-react';
 
-const CHANNELS = [
-  { id: 'email', name: 'Email', icon: Mail, color: 'blue' },
-  { id: 'telegram', name: 'Telegram', icon: Send, color: 'sky' },
-  { id: 'discord', name: 'Discord', icon: MessageCircle, color: 'indigo' },
-  { id: 'sms', name: 'SMS', icon: Smartphone, color: 'green' },
-  { id: 'slack', name: 'Slack', icon: MessageCircle, color: 'purple' },
-  { id: 'teams', name: 'Microsoft Teams', icon: MessageCircle, color: 'blue' },
-  { id: 'webhook', name: 'Webhook', icon: Webhook, color: 'gray' }
-];
-
-const SEVERITY_LEVELS = [
-  { id: 'info', name: 'Info', color: 'blue' },
-  { id: 'warning', name: 'Avertissement', color: 'yellow' },
-  { id: 'high', name: 'Élevé', color: 'orange' },
-  { id: 'critical', name: 'Critique', color: 'red' }
-];
-
-const ALERT_TYPES = [
-  { id: 'fall', name: 'Chute' },
-  { id: 'fire', name: 'Feu/Fumée' },
-  { id: 'intrusion', name: 'Intrusion' },
-  { id: 'ppe_violation', name: 'Non-conformité EPI' },
-  { id: 'crowd', name: 'Formation de foule' },
-  { id: 'loitering', name: 'Flânerie' },
-  { id: 'running', name: 'Course' },
-  { id: 'fighting', name: 'Bagarre' }
-];
-
 const NotificationsConfig = () => {
+  const { t } = useTranslation();
+
+  const CHANNELS = [
+    { id: 'email', name: t('notificationsConfig.channels.email'), icon: Mail, color: 'blue' },
+    { id: 'telegram', name: t('notificationsConfig.channels.telegram'), icon: Send, color: 'sky' },
+    { id: 'discord', name: t('notificationsConfig.channels.discord'), icon: MessageCircle, color: 'indigo' },
+    { id: 'sms', name: t('notificationsConfig.channels.sms'), icon: Smartphone, color: 'green' },
+    { id: 'slack', name: t('notificationsConfig.channels.slack'), icon: MessageCircle, color: 'purple' },
+    { id: 'teams', name: t('notificationsConfig.channels.teams'), icon: MessageCircle, color: 'blue' },
+    { id: 'webhook', name: t('notificationsConfig.channels.webhook'), icon: Webhook, color: 'gray' }
+  ];
+
+  const SEVERITY_LEVELS = [
+    { id: 'info', name: t('notificationsConfig.severity.info'), color: 'blue' },
+    { id: 'warning', name: t('notificationsConfig.severity.warning'), color: 'yellow' },
+    { id: 'high', name: t('notificationsConfig.severity.high'), color: 'orange' },
+    { id: 'critical', name: t('notificationsConfig.severity.critical'), color: 'red' }
+  ];
+
+  const ALERT_TYPES = [
+    { id: 'fall', name: t('notificationsConfig.alertTypes.fall') },
+    { id: 'fire', name: t('notificationsConfig.alertTypes.fire') },
+    { id: 'intrusion', name: t('notificationsConfig.alertTypes.intrusion') },
+    { id: 'ppe_violation', name: t('notificationsConfig.alertTypes.ppeViolation') },
+    { id: 'crowd', name: t('notificationsConfig.alertTypes.crowd') },
+    { id: 'loitering', name: t('notificationsConfig.alertTypes.loitering') },
+    { id: 'running', name: t('notificationsConfig.alertTypes.running') },
+    { id: 'fighting', name: t('notificationsConfig.alertTypes.fighting') }
+  ];
+
   const [channels, setChannels] = useState([]);
   const [showAddChannel, setShowAddChannel] = useState(false);
   const [newChannel, setNewChannel] = useState({
@@ -95,7 +97,7 @@ const NotificationsConfig = () => {
   };
 
   const deleteChannel = async (name) => {
-    if (!confirm(`Supprimer le canal "${name}" ?`)) return;
+    if (!confirm(t('notificationsConfig.confirmDelete', { name }))) return;
     
     try {
       await fetch(`/api/advanced/notifications/channels/${name}`, {
@@ -116,7 +118,7 @@ const NotificationsConfig = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           channel_name: channelName,
-          message: '🧪 Test notification from OhmVision'
+          message: t('notificationsConfig.testMessage')
         })
       });
       
@@ -147,8 +149,8 @@ const NotificationsConfig = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Configuration des Notifications</h1>
-          <p className="text-gray-500">Gérez vos canaux de notification multi-canal</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('notificationsConfig.title')}</h1>
+          <p className="text-gray-500">{t('notificationsConfig.subtitle')}</p>
         </div>
         
         <button
@@ -156,7 +158,7 @@ const NotificationsConfig = () => {
           className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
         >
           <Plus size={18} />
-          Ajouter un canal
+          {t('notificationsConfig.actions.addChannel')}
         </button>
       </div>
 
@@ -165,12 +167,12 @@ const NotificationsConfig = () => {
         {channels.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-xl">
             <Bell size={48} className="mx-auto text-gray-300 mb-4" />
-            <p className="text-gray-500">Aucun canal de notification configuré</p>
+            <p className="text-gray-500">{t('notificationsConfig.empty.title')}</p>
             <button
               onClick={() => setShowAddChannel(true)}
               className="mt-4 text-purple-600 hover:underline"
             >
-              Ajouter votre premier canal
+              {t('notificationsConfig.empty.cta')}
             </button>
           </div>
         ) : (
@@ -190,7 +192,7 @@ const NotificationsConfig = () => {
                       <h3 className="font-semibold text-gray-900">{channel.name}</h3>
                       <p className="text-sm text-gray-500">
                         {CHANNELS.find(c => c.id === channel.channel)?.name} • 
-                        Min: {SEVERITY_LEVELS.find(s => s.id === channel.min_severity)?.name}
+                        {t('notificationsConfig.minimumSeverity')}: {SEVERITY_LEVELS.find(s => s.id === channel.min_severity)?.name}
                       </p>
                     </div>
                   </div>
@@ -200,7 +202,7 @@ const NotificationsConfig = () => {
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       channel.enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
                     }`}>
-                      {channel.enabled ? 'Actif' : 'Inactif'}
+                      {channel.enabled ? t('common.active') : t('common.inactive')}
                     </span>
                     
                     {/* Test */}
@@ -208,7 +210,7 @@ const NotificationsConfig = () => {
                       onClick={() => testChannel(channel.name)}
                       disabled={testResult?.channel === channel.name && testResult?.status === 'testing'}
                       className="p-2 hover:bg-gray-100 rounded-lg"
-                      title="Tester"
+                      title={t('notificationsConfig.actions.test')}
                     >
                       {testResult?.channel === channel.name ? (
                         testResult.status === 'testing' ? (
@@ -227,7 +229,7 @@ const NotificationsConfig = () => {
                     <button
                       onClick={() => deleteChannel(channel.name)}
                       className="p-2 hover:bg-red-50 rounded-lg text-gray-400 hover:text-red-600"
-                      title="Supprimer"
+                      title={t('common.delete')}
                     >
                       <Trash2 size={20} />
                     </button>
@@ -246,7 +248,7 @@ const NotificationsConfig = () => {
                 {isExpanded && (
                   <div className="px-4 pb-4 border-t bg-gray-50">
                     <p className="py-3 text-sm text-gray-500">
-                      Configuration détaillée du canal...
+                      {t('notificationsConfig.detailsPlaceholder')}
                     </p>
                   </div>
                 )}
@@ -261,20 +263,20 @@ const NotificationsConfig = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b">
-              <h2 className="text-xl font-bold">Ajouter un Canal de Notification</h2>
+              <h2 className="text-xl font-bold">{t('notificationsConfig.modal.title')}</h2>
             </div>
             
             <div className="p-6 space-y-4">
               {/* Nom */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nom du canal
+                  {t('notificationsConfig.modal.fields.name')}
                 </label>
                 <input
                   type="text"
                   value={newChannel.name}
                   onChange={(e) => setNewChannel({...newChannel, name: e.target.value})}
-                  placeholder="Ex: Alertes Telegram"
+                  placeholder={t('notificationsConfig.modal.placeholders.name')}
                   className="w-full px-3 py-2 border rounded-lg"
                 />
               </div>
@@ -282,7 +284,7 @@ const NotificationsConfig = () => {
               {/* Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Type de canal
+                  {t('notificationsConfig.modal.fields.channelType')}
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {CHANNELS.map((ch) => {
@@ -322,7 +324,7 @@ const NotificationsConfig = () => {
               {/* Sévérité minimum */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Sévérité minimum
+                  {t('notificationsConfig.modal.fields.minimumSeverity')}
                 </label>
                 <select
                   value={newChannel.min_severity}
@@ -338,7 +340,7 @@ const NotificationsConfig = () => {
               {/* Types d'alertes */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Types d'alertes (laisser vide pour tous)
+                  {t('notificationsConfig.modal.fields.alertTypes')}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {ALERT_TYPES.map((type) => (
@@ -369,14 +371,14 @@ const NotificationsConfig = () => {
                 onClick={() => setShowAddChannel(false)}
                 className="px-4 py-2 border rounded-lg hover:bg-gray-50"
               >
-                Annuler
+                {t('common.cancel')}
               </button>
               <button
                 onClick={addChannel}
                 disabled={!newChannel.name || loading}
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
               >
-                {loading ? 'Ajout...' : 'Ajouter'}
+                {loading ? t('notificationsConfig.actions.adding') : t('common.add')}
               </button>
             </div>
           </div>
@@ -388,74 +390,86 @@ const NotificationsConfig = () => {
 
 // Configuration spécifique par canal
 
-const EmailConfig = ({ config, onChange }) => (
-  <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
-    <input
-      type="email"
-      placeholder="Email destinataire"
-      value={config.to_email || ''}
-      onChange={(e) => onChange({...config, to_email: e.target.value})}
-      className="w-full px-3 py-2 border rounded-lg"
-    />
-    <input
-      type="text"
-      placeholder="Serveur SMTP (ex: smtp.gmail.com)"
-      value={config.smtp_host || ''}
-      onChange={(e) => onChange({...config, smtp_host: e.target.value})}
-      className="w-full px-3 py-2 border rounded-lg"
-    />
-  </div>
-);
+const EmailConfig = ({ config, onChange }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+      <input
+        type="email"
+        placeholder={t('notificationsConfig.channelConfig.email.toEmail')}
+        value={config.to_email || ''}
+        onChange={(e) => onChange({...config, to_email: e.target.value})}
+        className="w-full px-3 py-2 border rounded-lg"
+      />
+      <input
+        type="text"
+        placeholder={t('notificationsConfig.channelConfig.email.smtpHost')}
+        value={config.smtp_host || ''}
+        onChange={(e) => onChange({...config, smtp_host: e.target.value})}
+        className="w-full px-3 py-2 border rounded-lg"
+      />
+    </div>
+  );
+};
 
-const TelegramConfig = ({ config, onChange }) => (
-  <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
-    <input
-      type="text"
-      placeholder="Bot Token (depuis @BotFather)"
-      value={config.bot_token || ''}
-      onChange={(e) => onChange({...config, bot_token: e.target.value})}
-      className="w-full px-3 py-2 border rounded-lg"
-    />
-    <input
-      type="text"
-      placeholder="Chat ID"
-      value={config.chat_id || ''}
-      onChange={(e) => onChange({...config, chat_id: e.target.value})}
-      className="w-full px-3 py-2 border rounded-lg"
-    />
-  </div>
-);
+const TelegramConfig = ({ config, onChange }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+      <input
+        type="text"
+        placeholder={t('notificationsConfig.channelConfig.telegram.botToken')}
+        value={config.bot_token || ''}
+        onChange={(e) => onChange({...config, bot_token: e.target.value})}
+        className="w-full px-3 py-2 border rounded-lg"
+      />
+      <input
+        type="text"
+        placeholder={t('notificationsConfig.channelConfig.telegram.chatId')}
+        value={config.chat_id || ''}
+        onChange={(e) => onChange({...config, chat_id: e.target.value})}
+        className="w-full px-3 py-2 border rounded-lg"
+      />
+    </div>
+  );
+};
 
-const DiscordConfig = ({ config, onChange }) => (
-  <div className="p-4 bg-gray-50 rounded-lg">
-    <input
-      type="text"
-      placeholder="URL du Webhook Discord"
-      value={config.webhook_url || ''}
-      onChange={(e) => onChange({...config, webhook_url: e.target.value})}
-      className="w-full px-3 py-2 border rounded-lg"
-    />
-  </div>
-);
+const DiscordConfig = ({ config, onChange }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="p-4 bg-gray-50 rounded-lg">
+      <input
+        type="text"
+        placeholder={t('notificationsConfig.channelConfig.discord.webhookUrl')}
+        value={config.webhook_url || ''}
+        onChange={(e) => onChange({...config, webhook_url: e.target.value})}
+        className="w-full px-3 py-2 border rounded-lg"
+      />
+    </div>
+  );
+};
 
-const WebhookConfig = ({ config, onChange }) => (
-  <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
-    <input
-      type="text"
-      placeholder="URL du Webhook"
-      value={config.url || ''}
-      onChange={(e) => onChange({...config, url: e.target.value})}
-      className="w-full px-3 py-2 border rounded-lg"
-    />
-    <select
-      value={config.method || 'POST'}
-      onChange={(e) => onChange({...config, method: e.target.value})}
-      className="w-full px-3 py-2 border rounded-lg"
-    >
-      <option value="POST">POST</option>
-      <option value="PUT">PUT</option>
-    </select>
-  </div>
-);
+const WebhookConfig = ({ config, onChange }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+      <input
+        type="text"
+        placeholder={t('notificationsConfig.channelConfig.webhook.url')}
+        value={config.url || ''}
+        onChange={(e) => onChange({...config, url: e.target.value})}
+        className="w-full px-3 py-2 border rounded-lg"
+      />
+      <select
+        value={config.method || 'POST'}
+        onChange={(e) => onChange({...config, method: e.target.value})}
+        className="w-full px-3 py-2 border rounded-lg"
+      >
+        <option value="POST">POST</option>
+        <option value="PUT">PUT</option>
+      </select>
+    </div>
+  );
+};
 
 export default NotificationsConfig;

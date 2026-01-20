@@ -3,12 +3,11 @@
  * Contrôle PTZ (Pan-Tilt-Zoom) et zoom numérique avancé
  */
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import {
-  ZoomIn, ZoomOut, Move, RotateCcw, Maximize2, Minimize2,
+  ZoomIn, ZoomOut, RotateCcw,
   ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Home,
-  Focus, Aperture, Sun, Moon, Camera, Save, Grid, Crosshair,
-  Circle, Square, Target, Eye, Settings, Sliders
+  Focus, Aperture, Sun, Camera, Save, Grid, Crosshair, Target, Sliders
 } from 'lucide-react';
 
 // Digital zoom viewer with pan

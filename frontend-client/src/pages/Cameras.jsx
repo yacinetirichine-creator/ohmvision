@@ -5,11 +5,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
   Camera,
   Plus,
   Search,
-  Filter,
   Grid,
   List,
   Wifi,
@@ -20,10 +20,11 @@ import {
   Eye,
   X
 } from 'lucide-react';
-import { useCamerasStore, useUIStore } from '../services/store';
+import { useCamerasStore } from '../services/store';
 
 // Add Camera Modal
 const AddCameraModal = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     location: '',
@@ -51,7 +52,7 @@ const AddCameraModal = ({ isOpen, onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">Ajouter une caméra</h2>
+          <h2 className="text-xl font-bold">{t('cameras.addModal.title')}</h2>
           <button onClick={onClose} className="p-2 hover:bg-dark-700 rounded-lg">
             <X size={20} />
           </button>
@@ -59,30 +60,30 @@ const AddCameraModal = ({ isOpen, onClose }) => {
         
         <form className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Nom de la caméra *</label>
+            <label className="block text-sm font-medium mb-2">{t('cameras.addModal.fields.nameRequired')}</label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Ex: Entrée principale"
+              placeholder={t('cameras.addModal.placeholders.name')}
               className="w-full bg-dark-700 border border-dark-600 rounded-xl px-4 py-3 focus:outline-none focus:border-primary"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium mb-2">Emplacement</label>
+            <label className="block text-sm font-medium mb-2">{t('cameras.addModal.fields.location')}</label>
             <input
               type="text"
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              placeholder="Ex: Bâtiment A, RDC"
+              placeholder={t('cameras.addModal.placeholders.location')}
               className="w-full bg-dark-700 border border-dark-600 rounded-xl px-4 py-3 focus:outline-none focus:border-primary"
             />
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Adresse IP</label>
+              <label className="block text-sm font-medium mb-2">{t('cameras.addModal.fields.ipAddress')}</label>
               <input
                 type="text"
                 value={formData.ip_address}
@@ -92,7 +93,7 @@ const AddCameraModal = ({ isOpen, onClose }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Port RTSP</label>
+              <label className="block text-sm font-medium mb-2">{t('cameras.addModal.fields.rtspPort')}</label>
               <input
                 type="text"
                 value="554"
@@ -103,7 +104,7 @@ const AddCameraModal = ({ isOpen, onClose }) => {
           </div>
           
           <div>
-            <label className="block text-sm font-medium mb-2">URL RTSP (optionnel)</label>
+            <label className="block text-sm font-medium mb-2">{t('cameras.addModal.fields.rtspUrlOptional')}</label>
             <input
               type="text"
               value={formData.rtsp_url}
@@ -115,7 +116,7 @@ const AddCameraModal = ({ isOpen, onClose }) => {
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Utilisateur</label>
+              <label className="block text-sm font-medium mb-2">{t('cameras.addModal.fields.username')}</label>
               <input
                 type="text"
                 value={formData.username}
@@ -125,7 +126,7 @@ const AddCameraModal = ({ isOpen, onClose }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Mot de passe</label>
+              <label className="block text-sm font-medium mb-2">{t('cameras.addModal.fields.password')}</label>
               <input
                 type="password"
                 value={formData.password}
@@ -142,13 +143,13 @@ const AddCameraModal = ({ isOpen, onClose }) => {
               onClick={onClose}
               className="flex-1 px-4 py-3 border border-dark-600 rounded-xl hover:bg-dark-700 transition-colors"
             >
-              Annuler
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               className="flex-1 px-4 py-3 bg-primary hover:bg-primary-dark text-white rounded-xl transition-colors"
             >
-              Ajouter
+              {t('common.add')}
             </button>
           </div>
         </form>
@@ -159,6 +160,7 @@ const AddCameraModal = ({ isOpen, onClose }) => {
 
 // Camera Card
 const CameraCard = ({ camera, viewMode }) => {
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   
   if (viewMode === 'list') {
@@ -209,7 +211,7 @@ const CameraCard = ({ camera, viewMode }) => {
               : 'bg-danger/20 text-danger'
           }`}>
             {camera.is_online ? <Wifi size={12} /> : <WifiOff size={12} />}
-            {camera.is_online ? 'En ligne' : 'Hors ligne'}
+            {camera.is_online ? t('cameras.status.online') : t('cameras.status.offline')}
           </div>
           
           {camera.is_online && (
@@ -228,7 +230,7 @@ const CameraCard = ({ camera, viewMode }) => {
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold truncate">{camera.name}</h3>
             <p className="text-sm text-gray-400 truncate">
-              {camera.location || camera.ip_address || 'Non configuré'}
+              {camera.location || camera.ip_address || t('cameras.notConfigured')}
             </p>
           </div>
           
@@ -252,18 +254,18 @@ const CameraCard = ({ camera, viewMode }) => {
                     to={`/cameras/${camera.id}`}
                     className="flex items-center gap-2 px-4 py-2 hover:bg-dark-600 transition-colors"
                   >
-                    <Eye size={16} /> Voir
+                    <Eye size={16} /> {t('common.view')}
                   </Link>
                   <Link
                     to={`/cameras/${camera.id}?settings=true`}
                     className="flex items-center gap-2 px-4 py-2 hover:bg-dark-600 transition-colors"
                   >
-                    <Settings size={16} /> Paramètres
+                    <Settings size={16} /> {t('common.settings')}
                   </Link>
                   <button
                     className="flex items-center gap-2 px-4 py-2 hover:bg-danger/10 text-danger w-full transition-colors"
                   >
-                    <Trash2 size={16} /> Supprimer
+                    <Trash2 size={16} /> {t('common.delete')}
                   </button>
                 </motion.div>
               )}
@@ -275,22 +277,22 @@ const CameraCard = ({ camera, viewMode }) => {
         <div className="flex flex-wrap gap-2 mt-3">
           {camera.detection_config?.person_detection && (
             <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-              👤 Personnes
+              👤 {t('cameras.badges.people')}
             </span>
           )}
           {camera.detection_config?.counting && (
             <span className="px-2 py-1 bg-purple/10 text-purple text-xs rounded-full">
-              📊 Comptage
+              📊 {t('cameras.badges.counting')}
             </span>
           )}
           {camera.detection_config?.fall_detection && (
             <span className="px-2 py-1 bg-warning/10 text-warning text-xs rounded-full">
-              ⬇️ Chute
+              ⬇️ {t('cameras.badges.fall')}
             </span>
           )}
           {camera.detection_config?.ppe_detection && (
             <span className="px-2 py-1 bg-success/10 text-success text-xs rounded-full">
-              🦺 EPI
+              🦺 {t('cameras.badges.ppe')}
             </span>
           )}
         </div>
@@ -301,8 +303,9 @@ const CameraCard = ({ camera, viewMode }) => {
 
 // Main Page
 export default function Cameras() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { cameras, fetchCameras, isLoading } = useCamerasStore();
+  const { cameras, fetchCameras, isLoading: _isLoading } = useCamerasStore();
   
   const [viewMode, setViewMode] = useState('grid');
   const [search, setSearch] = useState('');
@@ -331,11 +334,11 @@ export default function Cameras() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Caméras</h1>
+          <h1 className="text-2xl font-bold">{t('cameras.title')}</h1>
           <p className="text-gray-400">
-            {cameras.length} caméra{cameras.length > 1 ? 's' : ''} • 
-            <span className="text-success"> {onlineCount} en ligne</span> • 
-            <span className="text-danger"> {offlineCount} hors ligne</span>
+            {t('cameras.count', { count: cameras.length })} •
+            <span className="text-success"> {t('cameras.onlineCount', { count: onlineCount })}</span> •
+            <span className="text-danger"> {t('cameras.offlineCount', { count: offlineCount })}</span>
           </p>
         </div>
         
@@ -344,7 +347,7 @@ export default function Cameras() {
           className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-xl transition-colors"
         >
           <Plus size={20} />
-          <span>Ajouter</span>
+          <span>{t('common.add')}</span>
         </button>
       </div>
       
@@ -357,7 +360,7 @@ export default function Cameras() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Rechercher une caméra..."
+            placeholder={t('cameras.searchPlaceholder')}
             className="w-full bg-dark-800 border border-dark-600 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-primary"
           />
         </div>
@@ -366,9 +369,9 @@ export default function Cameras() {
         <div className="flex items-center gap-2">
           <div className="flex bg-dark-800 border border-dark-600 rounded-xl p-1">
             {[
-              { value: 'all', label: 'Toutes' },
-              { value: 'online', label: 'En ligne' },
-              { value: 'offline', label: 'Hors ligne' }
+              { value: 'all', label: t('cameras.filters.all') },
+              { value: 'online', label: t('cameras.filters.online') },
+              { value: 'offline', label: t('cameras.filters.offline') }
             ].map((option) => (
               <button
                 key={option.value}
@@ -411,12 +414,12 @@ export default function Cameras() {
         <div className="bg-dark-800 rounded-2xl p-12 text-center border border-dark-600">
           <Camera size={64} className="mx-auto text-gray-600 mb-4" />
           <h3 className="text-xl font-semibold mb-2">
-            {search || filter !== 'all' ? 'Aucun résultat' : 'Aucune caméra'}
+            {search || filter !== 'all' ? t('cameras.empty.noResultsTitle') : t('cameras.empty.noCamerasTitle')}
           </h3>
           <p className="text-gray-400 mb-6">
             {search || filter !== 'all'
-              ? 'Essayez de modifier vos filtres'
-              : 'Ajoutez votre première caméra pour commencer'}
+              ? t('cameras.empty.noResultsSubtitle')
+              : t('cameras.empty.noCamerasSubtitle')}
           </p>
           {!search && filter === 'all' && (
             <button
@@ -424,7 +427,7 @@ export default function Cameras() {
               className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-xl transition-colors"
             >
               <Plus size={20} />
-              Ajouter une caméra
+              {t('cameras.actions.addCamera')}
             </button>
           )}
         </div>

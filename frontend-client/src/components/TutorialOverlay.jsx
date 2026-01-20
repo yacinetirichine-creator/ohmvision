@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiX, FiArrowRight, FiInfo } from 'react-icons/fi';
+import { FiArrowRight } from 'react-icons/fi';
 
 const TutorialOverlay = ({ isOpen, onClose, steps = [] }) => {
   const [currentStep, setCurrentStep] = useState(0);

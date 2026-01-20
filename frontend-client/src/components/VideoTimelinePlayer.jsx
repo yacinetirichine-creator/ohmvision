@@ -3,12 +3,11 @@
  * Timeline de lecture vidéo avec replay, événements et navigation temporelle
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Play, Pause, SkipBack, SkipForward, Rewind, FastForward,
-  Volume2, VolumeX, Maximize2, Minimize2, Calendar, Clock,
-  ChevronLeft, ChevronRight, AlertTriangle, Users, Car, Flame,
-  Download, Share2, Bookmark, Flag, ZoomIn, ZoomOut, Settings,
+  Volume2, VolumeX, Maximize2, Minimize2, Calendar, AlertTriangle, Users, Car, Flame,
+  Download, Flag,
   Camera, Film, Scissors, Image
 } from 'lucide-react';
 
@@ -94,7 +93,7 @@ const ThumbnailPreview = ({ time, position, visible }) => {
 };
 
 // Time range selector
-const TimeRangeSelector = ({ startTime, endTime, onChange }) => {
+const TimeRangeSelector = ({ onChange }) => {
   const ranges = [
     { label: '1h', hours: 1 },
     { label: '4h', hours: 4 },
@@ -146,21 +145,21 @@ const VideoTimelinePlayer = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(86400); // 24h in seconds
-  const [volume, setVolume] = useState(1);
+  const [_volume, _setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   
   // Timeline state
-  const [timelineZoom, setTimelineZoom] = useState(1);
-  const [timelineOffset, setTimelineOffset] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
+  const [_timelineZoom, _setTimelineZoom] = useState(1);
+  const [_timelineOffset, _setTimelineOffset] = useState(0);
+  const [_isDragging, _setIsDragging] = useState(false);
   const [hoverPosition, setHoverPosition] = useState(null);
   const [hoverTime, setHoverTime] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   
   // Date selection
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, _setSelectedDate] = useState(new Date());
 
   // Format time helper
   const formatTime = (seconds) => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './services/store';
 import { useTranslation } from 'react-i18next';
 
@@ -12,6 +12,7 @@ import LandingPage from './pages/LandingPage';
 import { GDPRPage, LegalMentionsPage, PrivacyPage, CGUPage, CGVPage, ContractPolicyPage } from './pages/LegalPages';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import ModernDashboard from './pages/ModernDashboard';
 import Cameras from './pages/Cameras';
 import CameraView from './pages/CameraView';
 import Alerts from './pages/Alerts';
@@ -111,7 +112,7 @@ function App() {
         </ProtectedRoute>
       }>
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard/modern" element={<ModernDashboard />} />
         <Route path="/executive" element={<ExecutiveDashboard />} />
         <Route path="/cameras" element={<Cameras />} />
         <Route path="/cameras/:id" element={<CameraView />} />

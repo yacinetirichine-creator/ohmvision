@@ -5,6 +5,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
+import i18n from '../i18n';
+
+const getPreferredLanguage = () => {
+  const lang = localStorage.getItem('ohmvision_language');
+  if (lang === 'fr' || lang === 'en' || lang === 'es') return lang;
+  return 'fr';
+};
 
 // API Configuration
 const API_BASE = '/api';
@@ -22,6 +29,8 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  config.headers['Accept-Language'] = getPreferredLanguage();
   return config;
 });
 
@@ -43,7 +52,7 @@ api.interceptors.response.use(
 
 export const useAuthStore = create(
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       user: null,
       token: null,
       isAuthenticated: false,
@@ -72,7 +81,7 @@ export const useAuthStore = create(
           return { success: true };
         } catch (error) {
           set({
-            error: error.response?.data?.detail || 'Erreur de connexion',
+            error: error.response?.data?.detail || i18n.t('auth.errors.loginFailed'),
             isLoading: false
           });
           return { success: false, error: error.response?.data?.detail };
@@ -111,7 +120,7 @@ export const useAuthStore = create(
 // Cameras Store
 // ============================================================================
 
-export const useCamerasStore = create((set, get) => ({
+export const useCamerasStore = create((set, _get) => ({
   cameras: [],
   selectedCamera: null,
   isLoading: false,
@@ -166,7 +175,7 @@ export const useCamerasStore = create((set, get) => ({
 // Alerts Store
 // ============================================================================
 
-export const useAlertsStore = create((set, get) => ({
+export const useAlertsStore = create((set, _get) => ({
   alerts: [],
   unreadCount: 0,
   isLoading: false,
@@ -276,7 +285,7 @@ export const useAnalyticsStore = create((set) => ({
 // AI Agent Store
 // ============================================================================
 
-export const useAIStore = create((set, get) => ({
+export const useAIStore = create((set, _get) => ({
   messages: [],
   suggestions: [],
   isTyping: false,

@@ -5,9 +5,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
-  Bell, AlertTriangle, CheckCircle, Filter, Search,
-  ChevronDown, Eye, Trash2, Check, X, Camera,
+  Bell, AlertTriangle, CheckCircle, Filter, Search, Check, X, Camera,
   Flame, User, Shield, Car, Clock
 } from 'lucide-react';
 import { useAlertsStore, useCamerasStore } from '../services/store';
@@ -15,6 +15,7 @@ import { useAlertsStore, useCamerasStore } from '../services/store';
 const Alerts = () => {
   const { alerts, fetchAlerts, markAsRead, markAllAsRead, resolveAlert, isLoading } = useAlertsStore();
   const { cameras, fetchCameras } = useCamerasStore();
+  const { t } = useTranslation();
   
   const [filters, setFilters] = useState({
     type: '',
@@ -52,12 +53,12 @@ const Alerts = () => {
   }, {});
   
   const alertTypes = [
-    { value: 'person_detected', label: 'Personne détectée', icon: User },
-    { value: 'fall_detected', label: 'Chute', icon: AlertTriangle },
-    { value: 'ppe_missing', label: 'EPI manquant', icon: Shield },
-    { value: 'fire_detected', label: 'Feu', icon: Flame },
-    { value: 'intrusion', label: 'Intrusion', icon: AlertTriangle },
-    { value: 'vehicle_detected', label: 'Véhicule', icon: Car },
+    { value: 'person_detected', label: t('alerts.types.person_detected'), icon: User },
+    { value: 'fall_detected', label: t('alerts.types.fall_detected'), icon: AlertTriangle },
+    { value: 'ppe_missing', label: t('alerts.types.ppe_missing'), icon: Shield },
+    { value: 'fire_detected', label: t('alerts.types.fire_detected'), icon: Flame },
+    { value: 'intrusion', label: t('alerts.types.intrusion'), icon: AlertTriangle },
+    { value: 'vehicle_detected', label: t('alerts.types.vehicle_detected'), icon: Car },
   ];
   
   const severityColors = {
@@ -77,9 +78,12 @@ const Alerts = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Alertes</h1>
+          <h1 className="text-2xl font-bold">{t('alerts.title')}</h1>
           <p className="text-gray-500">
-            {filteredAlerts.filter(a => !a.is_read).length} non lues sur {filteredAlerts.length}
+            {t('alerts.unreadSummary', {
+              unread: filteredAlerts.filter(a => !a.is_read).length,
+              total: filteredAlerts.length
+            })}
           </p>
         </div>
         
@@ -89,7 +93,7 @@ const Alerts = () => {
             className="px-4 py-2 bg-dark-700 hover:bg-dark-600 rounded-lg text-sm flex items-center gap-2"
           >
             <CheckCircle size={16} />
-            Tout marquer comme lu
+            {t('alerts.actions.markAllRead')}
           </button>
         </div>
       </div>
@@ -100,7 +104,7 @@ const Alerts = () => {
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
           <input
             type="text"
-            placeholder="Rechercher une alerte..."
+            placeholder={t('alerts.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 bg-dark-800 border border-dark-500 rounded-xl focus:outline-none focus:border-primary"
@@ -114,7 +118,7 @@ const Alerts = () => {
           }`}
         >
           <Filter size={18} />
-          Filtres
+          {t('alerts.filters.button')}
           {Object.values(filters).some(v => v) && (
             <span className="w-2 h-2 bg-primary rounded-full" />
           )}
@@ -136,7 +140,7 @@ const Alerts = () => {
                 onChange={(e) => setFilters({ ...filters, type: e.target.value })}
                 className="px-3 py-2 bg-dark-700 rounded-lg text-sm focus:outline-none"
               >
-                <option value="">Tous les types</option>
+                <option value="">{t('alerts.filters.allTypes')}</option>
                 {alertTypes.map(type => (
                   <option key={type.value} value={type.value}>{type.label}</option>
                 ))}
@@ -147,11 +151,11 @@ const Alerts = () => {
                 onChange={(e) => setFilters({ ...filters, severity: e.target.value })}
                 className="px-3 py-2 bg-dark-700 rounded-lg text-sm focus:outline-none"
               >
-                <option value="">Toutes sévérités</option>
-                <option value="critical">Critique</option>
-                <option value="high">Haute</option>
-                <option value="medium">Moyenne</option>
-                <option value="low">Basse</option>
+                <option value="">{t('alerts.filters.allSeverities')}</option>
+                <option value="critical">{t('alerts.severity.critical')}</option>
+                <option value="high">{t('alerts.severity.high')}</option>
+                <option value="medium">{t('alerts.severity.medium')}</option>
+                <option value="low">{t('alerts.severity.low')}</option>
               </select>
               
               <select
@@ -159,10 +163,10 @@ const Alerts = () => {
                 onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                 className="px-3 py-2 bg-dark-700 rounded-lg text-sm focus:outline-none"
               >
-                <option value="">Tous les statuts</option>
-                <option value="unread">Non lues</option>
-                <option value="read">Lues</option>
-                <option value="resolved">Résolues</option>
+                <option value="">{t('alerts.filters.allStatuses')}</option>
+                <option value="unread">{t('alerts.status.unread')}</option>
+                <option value="read">{t('alerts.status.read')}</option>
+                <option value="resolved">{t('alerts.status.resolved')}</option>
               </select>
               
               <select
@@ -170,7 +174,7 @@ const Alerts = () => {
                 onChange={(e) => setFilters({ ...filters, camera: e.target.value })}
                 className="px-3 py-2 bg-dark-700 rounded-lg text-sm focus:outline-none"
               >
-                <option value="">Toutes les caméras</option>
+                <option value="">{t('alerts.filters.allCameras')}</option>
                 {cameras.map(cam => (
                   <option key={cam.id} value={cam.id}>{cam.name}</option>
                 ))}
@@ -180,7 +184,7 @@ const Alerts = () => {
                 onClick={() => setFilters({ type: '', severity: '', status: '', camera: '' })}
                 className="col-span-2 md:col-span-4 px-3 py-2 text-sm text-gray-400 hover:text-white"
               >
-                Réinitialiser les filtres
+                {t('alerts.filters.reset')}
               </button>
             </div>
           </motion.div>
@@ -197,7 +201,7 @@ const Alerts = () => {
       ) : filteredAlerts.length === 0 ? (
         <div className="text-center py-12 bg-dark-800 rounded-xl">
           <Bell size={48} className="mx-auto mb-4 text-gray-600" />
-          <p className="text-gray-500">Aucune alerte</p>
+          <p className="text-gray-500">{t('alerts.empty')}</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -205,7 +209,7 @@ const Alerts = () => {
             <div key={date}>
               <h3 className="text-sm text-gray-500 mb-3 flex items-center gap-2">
                 <Clock size={14} />
-                {date === new Date().toLocaleDateString() ? "Aujourd'hui" : date}
+                {date === new Date().toLocaleDateString() ? t('alerts.date.today') : date}
               </h3>
               
               <div className="space-y-2">
@@ -252,7 +256,7 @@ const Alerts = () => {
                             {alert.is_resolved && (
                               <span className="text-xs text-success flex items-center gap-1">
                                 <CheckCircle size={12} />
-                                Résolu
+                                {t('alerts.status.resolvedLabel')}
                               </span>
                             )}
                           </div>
@@ -262,7 +266,7 @@ const Alerts = () => {
                           <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                             <span className="flex items-center gap-1">
                               <Camera size={14} />
-                              {camera?.name || `Caméra ${alert.camera_id}`}
+                              {camera?.name || t('alerts.cameraFallback', { id: alert.camera_id })}
                             </span>
                             <span>
                               {new Date(alert.created_at).toLocaleTimeString()}
@@ -278,7 +282,7 @@ const Alerts = () => {
                                 resolveAlert(alert.id);
                               }}
                               className="p-2 hover:bg-success/20 rounded-lg text-gray-400 hover:text-success"
-                              title="Résoudre"
+                              title={t('alerts.actions.resolveTitle')}
                             >
                               <Check size={18} />
                             </button>
@@ -312,7 +316,7 @@ const Alerts = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">Détail de l'alerte</h2>
+                <h2 className="text-xl font-bold">{t('alerts.detail.title')}</h2>
                 <button
                   onClick={() => setSelectedAlert(null)}
                   className="p-2 hover:bg-dark-700 rounded-lg"
@@ -331,19 +335,19 @@ const Alerts = () => {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">Type</p>
+                    <p className="text-sm text-gray-500">{t('alerts.detail.fields.type')}</p>
                     <p className="font-medium">{selectedAlert.type.replace('_', ' ')}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Sévérité</p>
+                    <p className="text-sm text-gray-500">{t('alerts.detail.fields.severity')}</p>
                     <p className="font-medium capitalize">{selectedAlert.severity}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Date</p>
+                    <p className="text-sm text-gray-500">{t('alerts.detail.fields.date')}</p>
                     <p className="font-medium">{new Date(selectedAlert.created_at).toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Caméra</p>
+                    <p className="text-sm text-gray-500">{t('alerts.detail.fields.camera')}</p>
                     <p className="font-medium">
                       {cameras.find(c => c.id === selectedAlert.camera_id)?.name || `#${selectedAlert.camera_id}`}
                     </p>
@@ -352,10 +356,10 @@ const Alerts = () => {
                 
                 {selectedAlert.snapshot_url && (
                   <div>
-                    <p className="text-sm text-gray-500 mb-2">Capture</p>
+                    <p className="text-sm text-gray-500 mb-2">{t('alerts.detail.fields.snapshot')}</p>
                     <img
                       src={selectedAlert.snapshot_url}
-                      alt="Alert snapshot"
+                      alt={t('alerts.detail.snapshotAlt')}
                       className="w-full rounded-lg"
                     />
                   </div>
@@ -363,7 +367,7 @@ const Alerts = () => {
                 
                 {selectedAlert.data && Object.keys(selectedAlert.data).length > 0 && (
                   <div>
-                    <p className="text-sm text-gray-500 mb-2">Données</p>
+                    <p className="text-sm text-gray-500 mb-2">{t('alerts.detail.fields.data')}</p>
                     <pre className="bg-dark-900 p-3 rounded-lg text-xs overflow-x-auto">
                       {JSON.stringify(selectedAlert.data, null, 2)}
                     </pre>
@@ -380,14 +384,14 @@ const Alerts = () => {
                       className="flex-1 px-4 py-2 bg-success hover:bg-success/80 rounded-lg flex items-center justify-center gap-2"
                     >
                       <Check size={18} />
-                      Marquer comme résolu
+                      {t('alerts.actions.markResolved')}
                     </button>
                   )}
                   <button
                     onClick={() => setSelectedAlert(null)}
                     className="px-4 py-2 bg-dark-700 hover:bg-dark-600 rounded-lg"
                   >
-                    Fermer
+                    {t('common.close')}
                   </button>
                 </div>
               </div>

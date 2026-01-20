@@ -4,33 +4,33 @@
  */
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import {
-  Settings as SettingsIcon, User, Bell, Shield, Palette, Globe,
-  Key, Mail, Smartphone, CreditCard, Building, HelpCircle,
-  ChevronRight, Check, Moon, Sun, ExternalLink
+import { useTranslation } from 'react-i18next';
+import { User, Bell, Shield, Palette,
+  Key, Mail, Smartphone, CreditCard, HelpCircle,
+  ChevronRight, Check, Moon, Sun
 } from 'lucide-react';
 import { useAuthStore } from '../services/store';
 
 const Settings = () => {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState('profile');
   
   const tabs = [
-    { id: 'profile', label: 'Profil', icon: User },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'security', label: 'Sécurité', icon: Shield },
-    { id: 'appearance', label: 'Apparence', icon: Palette },
-    { id: 'billing', label: 'Abonnement', icon: CreditCard },
-    { id: 'help', label: 'Aide', icon: HelpCircle },
+    { id: 'profile', label: t('settings.tabs.profile'), icon: User },
+    { id: 'notifications', label: t('settings.tabs.notifications'), icon: Bell },
+    { id: 'security', label: t('settings.tabs.security'), icon: Shield },
+    { id: 'appearance', label: t('settings.tabs.appearance'), icon: Palette },
+    { id: 'billing', label: t('settings.tabs.billing'), icon: CreditCard },
+    { id: 'help', label: t('settings.tabs.help'), icon: HelpCircle },
   ];
   
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold">Paramètres</h1>
-        <p className="text-gray-500">Gérez vos préférences et votre compte</p>
+        <h1 className="text-2xl font-bold">{t('settings.title')}</h1>
+        <p className="text-gray-500">{t('settings.subtitle')}</p>
       </div>
       
       <div className="flex flex-col lg:flex-row gap-6">
@@ -75,6 +75,7 @@ const Settings = () => {
 
 // Profile Settings
 const ProfileSettings = ({ user }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     first_name: user?.first_name || '',
     last_name: user?.last_name || '',
@@ -85,8 +86,8 @@ const ProfileSettings = ({ user }) => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-1">Informations personnelles</h2>
-        <p className="text-gray-500 text-sm">Mettez à jour vos informations de profil</p>
+        <h2 className="text-xl font-semibold mb-1">{t('settings.profile.title')}</h2>
+        <p className="text-gray-500 text-sm">{t('settings.profile.subtitle')}</p>
       </div>
       
       {/* Avatar */}
@@ -96,16 +97,16 @@ const ProfileSettings = ({ user }) => {
         </div>
         <div>
           <button className="px-4 py-2 bg-primary hover:bg-primary-dark rounded-lg text-sm">
-            Changer la photo
+            {t('settings.profile.changePhoto')}
           </button>
-          <p className="text-xs text-gray-500 mt-1">JPG, PNG. Max 2MB</p>
+          <p className="text-xs text-gray-500 mt-1">{t('settings.profile.photoHint')}</p>
         </div>
       </div>
       
       {/* Form */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm text-gray-400 mb-2">Prénom</label>
+          <label className="block text-sm text-gray-400 mb-2">{t('settings.profile.fields.firstName')}</label>
           <input
             type="text"
             value={formData.first_name}
@@ -114,7 +115,7 @@ const ProfileSettings = ({ user }) => {
           />
         </div>
         <div>
-          <label className="block text-sm text-gray-400 mb-2">Nom</label>
+          <label className="block text-sm text-gray-400 mb-2">{t('settings.profile.fields.lastName')}</label>
           <input
             type="text"
             value={formData.last_name}
@@ -123,7 +124,7 @@ const ProfileSettings = ({ user }) => {
           />
         </div>
         <div>
-          <label className="block text-sm text-gray-400 mb-2">Email</label>
+          <label className="block text-sm text-gray-400 mb-2">{t('settings.profile.fields.email')}</label>
           <input
             type="email"
             value={formData.email}
@@ -132,12 +133,12 @@ const ProfileSettings = ({ user }) => {
           />
         </div>
         <div>
-          <label className="block text-sm text-gray-400 mb-2">Téléphone</label>
+          <label className="block text-sm text-gray-400 mb-2">{t('settings.profile.fields.phone')}</label>
           <input
             type="tel"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            placeholder="+33 6 00 00 00 00"
+            placeholder={t('settings.profile.placeholders.phone')}
             className="w-full px-4 py-3 bg-dark-700 border border-dark-500 rounded-xl focus:outline-none focus:border-primary"
           />
         </div>
@@ -145,7 +146,7 @@ const ProfileSettings = ({ user }) => {
       
       <div className="flex justify-end">
         <button className="px-6 py-2.5 bg-primary hover:bg-primary-dark rounded-xl">
-          Enregistrer
+          {t('settings.profile.save')}
         </button>
       </div>
     </div>
@@ -154,6 +155,7 @@ const ProfileSettings = ({ user }) => {
 
 // Notification Settings
 const NotificationSettings = () => {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState({
     email_alerts: true,
     sms_alerts: false,
@@ -178,20 +180,20 @@ const NotificationSettings = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-1">Notifications</h2>
-        <p className="text-gray-500 text-sm">Choisissez comment vous souhaitez être notifié</p>
+        <h2 className="text-xl font-semibold mb-1">{t('settings.notifications.title')}</h2>
+        <p className="text-gray-500 text-sm">{t('settings.notifications.subtitle')}</p>
       </div>
       
       {/* Channels */}
       <div>
-        <h3 className="font-medium mb-4">Canaux de notification</h3>
+        <h3 className="font-medium mb-4">{t('settings.notifications.channels.title')}</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Mail size={20} className="text-gray-400" />
               <div>
-                <p className="font-medium">Notifications par email</p>
-                <p className="text-sm text-gray-500">Recevoir les alertes par email</p>
+                <p className="font-medium">{t('settings.notifications.channels.email.title')}</p>
+                <p className="text-sm text-gray-500">{t('settings.notifications.channels.email.subtitle')}</p>
               </div>
             </div>
             <Toggle enabled={settings.email_alerts} onChange={(v) => setSettings({ ...settings, email_alerts: v })} />
@@ -201,8 +203,8 @@ const NotificationSettings = () => {
             <div className="flex items-center gap-3">
               <Smartphone size={20} className="text-gray-400" />
               <div>
-                <p className="font-medium">Notifications SMS</p>
-                <p className="text-sm text-gray-500">Recevoir les alertes par SMS</p>
+                <p className="font-medium">{t('settings.notifications.channels.sms.title')}</p>
+                <p className="text-sm text-gray-500">{t('settings.notifications.channels.sms.subtitle')}</p>
               </div>
             </div>
             <Toggle enabled={settings.sms_alerts} onChange={(v) => setSettings({ ...settings, sms_alerts: v })} />
@@ -212,8 +214,8 @@ const NotificationSettings = () => {
             <div className="flex items-center gap-3">
               <Bell size={20} className="text-gray-400" />
               <div>
-                <p className="font-medium">Notifications push</p>
-                <p className="text-sm text-gray-500">Notifications dans l'application</p>
+                <p className="font-medium">{t('settings.notifications.channels.push.title')}</p>
+                <p className="text-sm text-gray-500">{t('settings.notifications.channels.push.subtitle')}</p>
               </div>
             </div>
             <Toggle enabled={settings.push_alerts} onChange={(v) => setSettings({ ...settings, push_alerts: v })} />
@@ -223,13 +225,13 @@ const NotificationSettings = () => {
       
       {/* Severity Levels */}
       <div>
-        <h3 className="font-medium mb-4">Niveaux d'alerte</h3>
+        <h3 className="font-medium mb-4">{t('settings.notifications.severity.title')}</h3>
         <div className="space-y-3">
           {[
-            { key: 'alert_critical', label: 'Critique', color: 'danger' },
-            { key: 'alert_high', label: 'Haute', color: 'warning' },
-            { key: 'alert_medium', label: 'Moyenne', color: 'primary' },
-            { key: 'alert_low', label: 'Basse', color: 'gray-400' },
+            { key: 'alert_critical', label: t('settings.notifications.severity.levels.critical'), color: 'danger' },
+            { key: 'alert_high', label: t('settings.notifications.severity.levels.high'), color: 'warning' },
+            { key: 'alert_medium', label: t('settings.notifications.severity.levels.medium'), color: 'primary' },
+            { key: 'alert_low', label: t('settings.notifications.severity.levels.low'), color: 'gray-400' },
           ].map((level) => (
             <div key={level.key} className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -244,14 +246,14 @@ const NotificationSettings = () => {
       
       {/* Reports */}
       <div>
-        <h3 className="font-medium mb-4">Rapports automatiques</h3>
+        <h3 className="font-medium mb-4">{t('settings.notifications.reports.title')}</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span>Rapport quotidien</span>
+            <span>{t('settings.notifications.reports.daily')}</span>
             <Toggle enabled={settings.daily_report} onChange={(v) => setSettings({ ...settings, daily_report: v })} />
           </div>
           <div className="flex items-center justify-between">
-            <span>Rapport hebdomadaire</span>
+            <span>{t('settings.notifications.reports.weekly')}</span>
             <Toggle enabled={settings.weekly_report} onChange={(v) => setSettings({ ...settings, weekly_report: v })} />
           </div>
         </div>
@@ -262,11 +264,12 @@ const NotificationSettings = () => {
 
 // Security Settings
 const SecuritySettings = () => {
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-1">Sécurité</h2>
-        <p className="text-gray-500 text-sm">Gérez la sécurité de votre compte</p>
+        <h2 className="text-xl font-semibold mb-1">{t('settings.security.title')}</h2>
+        <p className="text-gray-500 text-sm">{t('settings.security.subtitle')}</p>
       </div>
       
       {/* Password */}
@@ -275,12 +278,12 @@ const SecuritySettings = () => {
           <div className="flex items-center gap-3">
             <Key size={20} className="text-gray-400" />
             <div>
-              <p className="font-medium">Mot de passe</p>
-              <p className="text-sm text-gray-500">Dernière modification il y a 30 jours</p>
+              <p className="font-medium">{t('settings.security.password.title')}</p>
+              <p className="text-sm text-gray-500">{t('settings.security.password.lastChanged')}</p>
             </div>
           </div>
           <button className="px-4 py-2 bg-dark-600 hover:bg-dark-500 rounded-lg text-sm">
-            Modifier
+            {t('settings.security.password.edit')}
           </button>
         </div>
       </div>
@@ -291,19 +294,19 @@ const SecuritySettings = () => {
           <div className="flex items-center gap-3">
             <Shield size={20} className="text-gray-400" />
             <div>
-              <p className="font-medium">Authentification à deux facteurs</p>
-              <p className="text-sm text-gray-500">Sécurisez votre compte avec 2FA</p>
+              <p className="font-medium">{t('settings.security.twoFactor.title')}</p>
+              <p className="text-sm text-gray-500">{t('settings.security.twoFactor.subtitle')}</p>
             </div>
           </div>
           <button className="px-4 py-2 bg-primary hover:bg-primary-dark rounded-lg text-sm">
-            Activer
+            {t('settings.security.twoFactor.enable')}
           </button>
         </div>
       </div>
       
       {/* Sessions */}
       <div>
-        <h3 className="font-medium mb-4">Sessions actives</h3>
+        <h3 className="font-medium mb-4">{t('settings.security.sessions.title')}</h3>
         <div className="space-y-3">
           {[
             { device: 'Chrome - Windows', location: 'Paris, France', current: true },
@@ -315,7 +318,7 @@ const SecuritySettings = () => {
                   {session.device}
                   {session.current && (
                     <span className="text-xs bg-success/20 text-success px-2 py-0.5 rounded">
-                      Session actuelle
+                      {t('settings.security.sessions.current')}
                     </span>
                   )}
                 </p>
@@ -323,7 +326,7 @@ const SecuritySettings = () => {
               </div>
               {!session.current && (
                 <button className="text-sm text-danger hover:text-danger/80">
-                  Déconnecter
+                  {t('settings.security.sessions.disconnect')}
                 </button>
               )}
             </div>
@@ -336,23 +339,23 @@ const SecuritySettings = () => {
 
 // Appearance Settings
 const AppearanceSettings = () => {
+  const { t, i18n } = useTranslation();
   const [theme, setTheme] = useState('dark');
-  const [language, setLanguage] = useState('fr');
   
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-1">Apparence</h2>
-        <p className="text-gray-500 text-sm">Personnalisez l'interface</p>
+        <h2 className="text-xl font-semibold mb-1">{t('settings.appearance.title')}</h2>
+        <p className="text-gray-500 text-sm">{t('settings.appearance.subtitle')}</p>
       </div>
       
       {/* Theme */}
       <div>
-        <h3 className="font-medium mb-4">Thème</h3>
+        <h3 className="font-medium mb-4">{t('settings.appearance.theme.title')}</h3>
         <div className="flex gap-3">
           {[
-            { id: 'dark', label: 'Sombre', icon: Moon },
-            { id: 'light', label: 'Clair', icon: Sun },
+            { id: 'dark', label: t('settings.appearance.theme.dark'), icon: Moon },
+            { id: 'light', label: t('settings.appearance.theme.light'), icon: Sun },
           ].map((t) => (
             <button
               key={t.id}
@@ -372,16 +375,15 @@ const AppearanceSettings = () => {
       
       {/* Language */}
       <div>
-        <h3 className="font-medium mb-4">Langue</h3>
+        <h3 className="font-medium mb-4">{t('settings.appearance.language.title')}</h3>
         <select
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
+          value={i18n.resolvedLanguage || i18n.language || 'fr'}
+          onChange={(e) => i18n.changeLanguage(e.target.value)}
           className="w-full px-4 py-3 bg-dark-700 border border-dark-500 rounded-xl focus:outline-none focus:border-primary"
         >
-          <option value="fr">🇫🇷 Français</option>
-          <option value="en">🇬🇧 English</option>
-          <option value="es">🇪🇸 Español</option>
-          <option value="de">🇩🇪 Deutsch</option>
+          <option value="fr">{t('common.languages.fr')}</option>
+          <option value="en">{t('common.languages.en')}</option>
+          <option value="es">{t('common.languages.es')}</option>
         </select>
       </div>
     </div>
@@ -390,52 +392,53 @@ const AppearanceSettings = () => {
 
 // Billing Settings
 const BillingSettings = () => {
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-1">Abonnement</h2>
-        <p className="text-gray-500 text-sm">Gérez votre forfait et votre facturation</p>
+        <h2 className="text-xl font-semibold mb-1">{t('settings.billing.title')}</h2>
+        <p className="text-gray-500 text-sm">{t('settings.billing.subtitle')}</p>
       </div>
       
       {/* Current Plan */}
       <div className="p-6 bg-gradient-to-br from-primary/20 to-purple/20 rounded-2xl border border-primary/30">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <span className="text-sm text-gray-400">Plan actuel</span>
+            <span className="text-sm text-gray-400">{t('settings.billing.currentPlan.label')}</span>
             <h3 className="text-2xl font-bold">Business</h3>
           </div>
           <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm">
-            Actif
+            {t('common.active')}
           </span>
         </div>
         
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <p className="text-sm text-gray-400">Prix</p>
+            <p className="text-sm text-gray-400">{t('settings.billing.currentPlan.price')}</p>
             <p className="font-semibold">149€/mois</p>
           </div>
           <div>
-            <p className="text-sm text-gray-400">Prochain paiement</p>
+            <p className="text-sm text-gray-400">{t('settings.billing.currentPlan.nextPayment')}</p>
             <p className="font-semibold">15 janvier 2025</p>
           </div>
           <div>
-            <p className="text-sm text-gray-400">Caméras</p>
+            <p className="text-sm text-gray-400">{t('settings.billing.currentPlan.cameras')}</p>
             <p className="font-semibold">8 / 20</p>
           </div>
           <div>
-            <p className="text-sm text-gray-400">Utilisateurs</p>
+            <p className="text-sm text-gray-400">{t('settings.billing.currentPlan.users')}</p>
             <p className="font-semibold">3 / 5</p>
           </div>
         </div>
         
         <button className="w-full py-2.5 bg-primary hover:bg-primary-dark rounded-xl">
-          Changer de forfait
+          {t('settings.billing.currentPlan.change')}
         </button>
       </div>
       
       {/* Payment Method */}
       <div>
-        <h3 className="font-medium mb-4">Mode de paiement</h3>
+        <h3 className="font-medium mb-4">{t('settings.billing.paymentMethod.title')}</h3>
         <div className="p-4 bg-dark-700 rounded-xl flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-7 bg-gradient-to-r from-blue-600 to-blue-400 rounded flex items-center justify-center text-white text-xs font-bold">
@@ -443,16 +446,16 @@ const BillingSettings = () => {
             </div>
             <div>
               <p className="font-medium">•••• •••• •••• 4242</p>
-              <p className="text-sm text-gray-500">Expire 12/26</p>
+              <p className="text-sm text-gray-500">{t('settings.billing.paymentMethod.expires', { date: '12/26' })}</p>
             </div>
           </div>
-          <button className="text-sm text-primary">Modifier</button>
+          <button className="text-sm text-primary">{t('settings.billing.paymentMethod.edit')}</button>
         </div>
       </div>
       
       {/* Invoices */}
       <div>
-        <h3 className="font-medium mb-4">Historique de facturation</h3>
+        <h3 className="font-medium mb-4">{t('settings.billing.invoices.title')}</h3>
         <div className="space-y-2">
           {[
             { date: 'Déc 2024', amount: '149,00 €', status: 'Payée' },
@@ -466,7 +469,7 @@ const BillingSettings = () => {
               </div>
               <div className="flex items-center gap-4">
                 <span className="font-medium">{invoice.amount}</span>
-                <button className="text-sm text-primary">Télécharger</button>
+                <button className="text-sm text-primary">{t('settings.billing.invoices.download')}</button>
               </div>
             </div>
           ))}
@@ -478,19 +481,20 @@ const BillingSettings = () => {
 
 // Help Section
 const HelpSection = () => {
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-1">Aide & Support</h2>
-        <p className="text-gray-500 text-sm">Besoin d'aide ? Nous sommes là pour vous</p>
+        <h2 className="text-xl font-semibold mb-1">{t('settings.help.title')}</h2>
+        <p className="text-gray-500 text-sm">{t('settings.help.subtitle')}</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[
-          { title: 'Documentation', desc: 'Guides et tutoriels', icon: '📚' },
-          { title: 'FAQ', desc: 'Questions fréquentes', icon: '❓' },
-          { title: 'Contacter le support', desc: 'Ouvrir un ticket', icon: '💬' },
-          { title: 'Statut du service', desc: 'État des systèmes', icon: '🟢' },
+          { title: t('settings.help.cards.documentation.title'), desc: t('settings.help.cards.documentation.desc'), icon: '📚' },
+          { title: t('settings.help.cards.faq.title'), desc: t('settings.help.cards.faq.desc'), icon: '❓' },
+          { title: t('settings.help.cards.support.title'), desc: t('settings.help.cards.support.desc'), icon: '💬' },
+          { title: t('settings.help.cards.status.title'), desc: t('settings.help.cards.status.desc'), icon: '🟢' },
         ].map((item, index) => (
           <button
             key={index}
@@ -507,7 +511,7 @@ const HelpSection = () => {
       </div>
       
       <div className="p-4 bg-dark-700 rounded-xl">
-        <p className="text-sm text-gray-400 mb-2">Version de l'application</p>
+        <p className="text-sm text-gray-400 mb-2">{t('settings.help.appVersion')}</p>
         <p className="font-mono">OhmVision v1.0.0</p>
       </div>
     </div>

@@ -4,12 +4,12 @@
   Mis à jour : Janvier 2026
 */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   FiShield, FiLock, FiFileText, FiArrowLeft, FiBook, 
-  FiCreditCard, FiClipboard, FiCheck, FiAlertTriangle,
-  FiMail, FiPhone, FiMapPin, FiChevronDown, FiChevronUp
+  FiCreditCard, FiClipboard, FiAlertTriangle,
+  FiMail, FiPhone, FiMapPin
 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -46,7 +46,7 @@ const LegalLayout = ({ title, icon: Icon, lastUpdate, children }) => {
             <div className="flex-1">
               <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">{title}</h1>
               {lastUpdate && (
-                <p className="text-sm text-gray-500">Dernière mise à jour : {lastUpdate}</p>
+                <p className="text-sm text-gray-500">{t('legal.lastUpdated', { date: lastUpdate })}</p>
               )}
             </div>
           </div>
@@ -74,7 +74,7 @@ const LegalLayout = ({ title, icon: Icon, lastUpdate, children }) => {
 
         {/* Footer légal */}
         <div className="text-center text-sm text-gray-500 mt-8">
-          <p>© 2026 OhmTronic SAS - Tous droits réservés</p>
+          <p>{t('legal.footer.copyright')}</p>
           <div className="flex flex-wrap justify-center gap-4 mt-3">
             <Link to="/legal/mentions" className="hover:text-ohm-cyan transition-colors">{t('legal.links.mentions')}</Link>
             <Link to="/legal/privacy" className="hover:text-ohm-cyan transition-colors">{t('legal.links.privacy')}</Link>
@@ -91,8 +91,11 @@ const LegalLayout = ({ title, icon: Icon, lastUpdate, children }) => {
 // ============================================
 // 1. MENTIONS LÉGALES
 // ============================================
-export const LegalMentionsPage = () => (
-  <LegalLayout title="Mentions Légales" icon={FiFileText} lastUpdate="20 janvier 2026">
+export const LegalMentionsPage = () => {
+  const { t } = useTranslation();
+
+  return (
+    <LegalLayout title={t('legal.pages.mentions')} icon={FiFileText} lastUpdate="20 janvier 2026">
     
     <h2>Article 1 – Éditeur du Service</h2>
     <p>
@@ -208,14 +211,18 @@ export const LegalMentionsPage = () => (
       tentative de résolution amiable, compétence exclusive est attribuée aux tribunaux de Paris.
     </p>
 
-  </LegalLayout>
-);
+    </LegalLayout>
+  );
+};
 
 // ============================================
 // 2. POLITIQUE DE CONFIDENTIALITÉ
 // ============================================
-export const PrivacyPage = () => (
-  <LegalLayout title="Politique de Confidentialité" icon={FiLock} lastUpdate="20 janvier 2026">
+export const PrivacyPage = () => {
+  const { t } = useTranslation();
+
+  return (
+    <LegalLayout title={t('legal.pages.privacy')} icon={FiLock} lastUpdate="20 janvier 2026">
     
     <div className="bg-ohm-cyan/10 border border-ohm-cyan/30 rounded-xl p-6 mb-8">
       <p className="text-white">
@@ -509,14 +516,18 @@ export const PrivacyPage = () => (
       informé par email et/ou notification dans l'application au moins 30 jours avant l'entrée en vigueur.
     </p>
 
-  </LegalLayout>
-);
+    </LegalLayout>
+  );
+};
 
 // ============================================
 // 3. CONDITIONS GÉNÉRALES D'UTILISATION (CGU)
 // ============================================
-export const CGUPage = () => (
-  <LegalLayout title="Conditions Générales d'Utilisation" icon={FiBook} lastUpdate="20 janvier 2026">
+export const CGUPage = () => {
+  const { t } = useTranslation();
+
+  return (
+    <LegalLayout title={t('legal.pages.cgu')} icon={FiBook} lastUpdate="20 janvier 2026">
     
     <div className="bg-white/5 rounded-xl p-6 mb-8">
       <p className="text-white font-medium mb-2">Préambule</p>
@@ -742,14 +753,18 @@ export const CGUPage = () => (
       en vigueur. Le fait de ne pas exercer un droit ne constitue pas une renonciation à ce droit.
     </p>
 
-  </LegalLayout>
-);
+    </LegalLayout>
+  );
+};
 
 // ============================================
 // 4. CONDITIONS GÉNÉRALES DE VENTE (CGV)
 // ============================================
-export const CGVPage = () => (
-  <LegalLayout title="Conditions Générales de Vente" icon={FiCreditCard} lastUpdate="20 janvier 2026">
+export const CGVPage = () => {
+  const { t } = useTranslation();
+
+  return (
+    <LegalLayout title={t('legal.pages.cgv')} icon={FiCreditCard} lastUpdate="20 janvier 2026">
     
     <div className="bg-white/5 rounded-xl p-6 mb-8">
       <p className="text-white font-medium mb-2">Champ d'application</p>
@@ -1076,14 +1091,18 @@ export const CGVPage = () => (
       applicables aux consommateurs.
     </p>
 
-  </LegalLayout>
-);
+    </LegalLayout>
+  );
+};
 
 // ============================================
 // 5. CONFORMITÉ RGPD
 // ============================================
-export const GDPRPage = () => (
-  <LegalLayout title="Conformité RGPD" icon={FiShield} lastUpdate="20 janvier 2026">
+export const GDPRPage = () => {
+  const { t } = useTranslation();
+
+  return (
+    <LegalLayout title={t('legal.pages.gdpr')} icon={FiShield} lastUpdate="20 janvier 2026">
     
     <div className="bg-ohm-cyan/10 border border-ohm-cyan/30 rounded-xl p-6 mb-8">
       <p className="text-white font-medium mb-2">Notre engagement</p>
@@ -1333,14 +1352,18 @@ export const GDPRPage = () => (
       </p>
     </div>
 
-  </LegalLayout>
-);
+    </LegalLayout>
+  );
+};
 
 // ============================================
 // 6. POLITIQUE CONTRACTUELLE (ABONNEMENTS)
 // ============================================
-export const ContractPolicyPage = () => (
-  <LegalLayout title="Politique Contractuelle" icon={FiClipboard} lastUpdate="20 janvier 2026">
+export const ContractPolicyPage = () => {
+  const { t } = useTranslation();
+
+  return (
+    <LegalLayout title={t('legal.pages.contractPolicy')} icon={FiClipboard} lastUpdate="20 janvier 2026">
     
     <div className="bg-white/5 rounded-xl p-6 mb-8">
       <p className="text-sm">
@@ -1580,8 +1603,9 @@ export const ContractPolicyPage = () => (
       remplacent tout accord antérieur portant sur le même objet.
     </p>
 
-  </LegalLayout>
-);
+    </LegalLayout>
+  );
+};
 
 // Export par défaut pour compatibilité
 export default {

@@ -6,9 +6,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../services/store';
 
 export default function Login() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { login, isLoading, error } = useAuthStore();
   
@@ -30,9 +32,9 @@ export default function Login() {
       animate={{ opacity: 1, y: 0 }}
       className="bg-dark-800 rounded-2xl p-8 border border-dark-600 shadow-xl"
     >
-      <h2 className="text-2xl font-bold mb-2">Connexion</h2>
+      <h2 className="text-2xl font-bold mb-2">{t('auth.login.title')}</h2>
       <p className="text-gray-400 mb-6">
-        Connectez-vous pour accéder à votre tableau de bord
+        {t('auth.login.subtitle')}
       </p>
       
       {error && (
@@ -48,14 +50,14 @@ export default function Login() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email */}
         <div>
-          <label className="block text-sm font-medium mb-2">Email</label>
+          <label className="block text-sm font-medium mb-2">{t('auth.fields.email')}</label>
           <div className="relative">
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="votreemail@exemple.com"
+              placeholder={t('auth.placeholders.email')}
               required
               className="w-full bg-dark-700 border border-dark-600 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-primary transition-colors"
             />
@@ -64,14 +66,14 @@ export default function Login() {
         
         {/* Password */}
         <div>
-          <label className="block text-sm font-medium mb-2">Mot de passe</label>
+          <label className="block text-sm font-medium mb-2">{t('auth.fields.password')}</label>
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <input
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder={t('auth.placeholders.password')}
               required
               className="w-full bg-dark-700 border border-dark-600 rounded-xl pl-12 pr-12 py-3 focus:outline-none focus:border-primary transition-colors"
             />
@@ -89,10 +91,10 @@ export default function Login() {
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" className="w-4 h-4 rounded bg-dark-700 border-dark-600" />
-            <span className="text-sm text-gray-400">Se souvenir</span>
+            <span className="text-sm text-gray-400">{t('auth.login.rememberMe')}</span>
           </label>
           <a href="#" className="text-sm text-primary hover:underline">
-            Mot de passe oublié ?
+            {t('auth.login.forgotPassword')}
           </a>
         </div>
         
@@ -105,17 +107,17 @@ export default function Login() {
           {isLoading ? (
             <>
               <Loader2 size={20} className="animate-spin" />
-              Connexion...
+              {t('auth.login.loading')}
             </>
           ) : (
-            'Se connecter'
+            t('auth.login.submit')
           )}
         </button>
       </form>
       
       {/* Demo credentials */}
       <div className="mt-6 p-4 bg-dark-700/50 rounded-xl">
-        <p className="text-sm text-gray-400 mb-2">Compte démo :</p>
+        <p className="text-sm text-gray-400 mb-2">{t('auth.login.demoAccount')}</p>
         <p className="text-sm font-mono">demo@ohmvision.fr / demo123</p>
       </div>
     </motion.div>

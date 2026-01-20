@@ -29,7 +29,7 @@ const AppLayout = () => {
   useEffect(() => { closeSidebar(); }, [location.pathname]);
   
   const navItems = [
-    { path: '/', icon: LayoutDashboard, label: t('nav.dashboard') },
+    { path: '/dashboard', icon: LayoutDashboard, label: t('nav.dashboard') },
     { path: '/executive', icon: Crown, label: t('nav.executive') },
     { path: '/cameras', icon: Camera, label: t('nav.cameras') },
     { path: '/alerts', icon: Bell, label: t('nav.alerts'), badge: unreadCount },

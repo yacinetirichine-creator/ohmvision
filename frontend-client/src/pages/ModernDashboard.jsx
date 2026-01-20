@@ -4,19 +4,27 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
-  Camera, Bell, Activity, Users, Car, Flame, Shield, Clock,
-  ChevronRight, AlertTriangle, TrendingUp, Eye, Zap, Map,
-  BarChart2, PieChart, Settings, Maximize2, Filter, Calendar,
-  Sun, Moon, Thermometer, Wind, Droplets
+  Camera, Bell, Activity, Users, Shield, Clock, AlertTriangle, Map, Settings, Filter,
+  Sun
 } from 'lucide-react';
 import MultiCameraView from '../components/MultiCameraView';
 import RealTimeStats from '../components/RealTimeStats';
+import { useAuthStore } from '../services/store';
+
+const getLocaleFromLanguage = (language) => {
+  if (language?.startsWith('en')) return 'en-US';
+  if (language?.startsWith('es')) return 'es-ES';
+  return 'fr-FR';
+};
 
 // Header with time and weather
-const DashboardHeader = () => {
+const DashboardHeader = ({ name }) => {
+  const { t, i18n } = useTranslation();
   const [time, setTime] = useState(new Date());
-  const [isDark, setIsDark] = useState(true);
+
+  const locale = getLocaleFromLanguage(i18n.language);
   
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -27,17 +35,17 @@ const DashboardHeader = () => {
     <div className="flex items-center justify-between mb-6">
       <div>
         <h1 className="text-2xl font-bold text-white mb-1">
-          Bonjour, YACINE 👋
+          {t('modernDashboard.header.greeting', { name: name || '—' })}
         </h1>
         <p className="text-gray-400 flex items-center gap-2">
           <Clock size={14} />
-          {time.toLocaleDateString('fr-FR', { 
+          {time.toLocaleDateString(locale, { 
             weekday: 'long', 
             day: 'numeric', 
             month: 'long' 
           })}
           <span className="text-primary font-mono">
-            {time.toLocaleTimeString('fr-FR')}
+            {time.toLocaleTimeString(locale)}
           </span>
         </p>
       </div>
@@ -48,7 +56,7 @@ const DashboardHeader = () => {
           <Sun size={20} className="text-yellow-400" />
           <div>
             <p className="text-sm font-medium text-white">23°C</p>
-            <p className="text-xs text-gray-500">Paris</p>
+            <p className="text-xs text-gray-500">{t('modernDashboard.weather.city')}</p>
           </div>
         </div>
         
@@ -83,86 +91,96 @@ const QuickStat = ({ icon: Icon, value, label, color, pulse = false }) => (
 );
 
 // Site map placeholder
-const SiteMapWidget = () => (
-  <div className="h-full rounded-2xl bg-dark-800/50 backdrop-blur-xl border border-dark-700 overflow-hidden">
-    <div className="p-4 border-b border-dark-700">
-      <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-        <Map size={16} className="text-primary" />
-        Plan du site
-      </h3>
-    </div>
-    <div className="relative h-48 bg-dark-900">
-      {/* Placeholder for site map */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center text-gray-500">
-          <Map size={48} className="mx-auto mb-2 opacity-30" />
-          <p className="text-sm">Plan interactif</p>
-          <p className="text-xs">Bientôt disponible</p>
-        </div>
-      </div>
-      
-      {/* Camera markers (simulated) */}
-      <div className="absolute top-1/4 left-1/4 w-4 h-4 rounded-full bg-green-500 animate-ping opacity-50" />
-      <div className="absolute top-1/4 left-1/4 w-3 h-3 rounded-full bg-green-500" />
-      
-      <div className="absolute top-1/2 right-1/3 w-4 h-4 rounded-full bg-green-500 animate-ping opacity-50" />
-      <div className="absolute top-1/2 right-1/3 w-3 h-3 rounded-full bg-green-500" />
-      
-      <div className="absolute bottom-1/4 left-1/2 w-4 h-4 rounded-full bg-red-500 animate-ping opacity-50" />
-      <div className="absolute bottom-1/4 left-1/2 w-3 h-3 rounded-full bg-red-500" />
-    </div>
-  </div>
-);
+const SiteMapWidget = () => {
+  const { t } = useTranslation();
 
-// Recent alerts widget
-const RecentAlertsWidget = ({ alerts }) => (
-  <div className="h-full rounded-2xl bg-dark-800/50 backdrop-blur-xl border border-dark-700 overflow-hidden flex flex-col">
-    <div className="p-4 border-b border-dark-700 flex items-center justify-between">
-      <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-        <AlertTriangle size={16} className="text-orange-400" />
-        Alertes récentes
-      </h3>
-      <button className="text-xs text-primary hover:underline">Voir tout</button>
-    </div>
-    
-    <div className="flex-1 overflow-y-auto p-2 space-y-2">
-      {alerts.map((alert, index) => (
-        <div 
-          key={index}
-          className={`
-            p-3 rounded-xl border-l-4
-            ${alert.severity === 'critical' ? 'border-l-red-500 bg-red-500/10' :
-              alert.severity === 'warning' ? 'border-l-orange-500 bg-orange-500/10' :
-              'border-l-blue-500 bg-blue-500/10'}
-          `}
-        >
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{alert.title}</p>
-              <p className="text-xs text-gray-400 mt-0.5">{alert.camera}</p>
-            </div>
-            <span className="text-xs text-gray-500 whitespace-nowrap">{alert.time}</span>
+  return (
+    <div className="h-full rounded-2xl bg-dark-800/50 backdrop-blur-xl border border-dark-700 overflow-hidden">
+      <div className="p-4 border-b border-dark-700">
+        <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+          <Map size={16} className="text-primary" />
+          {t('modernDashboard.siteMap.title')}
+        </h3>
+      </div>
+      <div className="relative h-48 bg-dark-900">
+        {/* Placeholder for site map */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-gray-500">
+            <Map size={48} className="mx-auto mb-2 opacity-30" />
+            <p className="text-sm">{t('modernDashboard.siteMap.placeholder.title')}</p>
+            <p className="text-xs">{t('modernDashboard.siteMap.placeholder.subtitle')}</p>
           </div>
         </div>
-      ))}
+        
+        {/* Camera markers (simulated) */}
+        <div className="absolute top-1/4 left-1/4 w-4 h-4 rounded-full bg-green-500 animate-ping opacity-50" />
+        <div className="absolute top-1/4 left-1/4 w-3 h-3 rounded-full bg-green-500" />
+        
+        <div className="absolute top-1/2 right-1/3 w-4 h-4 rounded-full bg-green-500 animate-ping opacity-50" />
+        <div className="absolute top-1/2 right-1/3 w-3 h-3 rounded-full bg-green-500" />
+        
+        <div className="absolute bottom-1/4 left-1/2 w-4 h-4 rounded-full bg-red-500 animate-ping opacity-50" />
+        <div className="absolute bottom-1/4 left-1/2 w-3 h-3 rounded-full bg-red-500" />
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
+// Recent alerts widget
+const RecentAlertsWidget = ({ alerts }) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="h-full rounded-2xl bg-dark-800/50 backdrop-blur-xl border border-dark-700 overflow-hidden flex flex-col">
+      <div className="p-4 border-b border-dark-700 flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+          <AlertTriangle size={16} className="text-orange-400" />
+          {t('modernDashboard.recentAlerts.title')}
+        </h3>
+        <button className="text-xs text-primary hover:underline">{t('modernDashboard.actions.viewAll')}</button>
+      </div>
+      
+      <div className="flex-1 overflow-y-auto p-2 space-y-2">
+        {alerts.map((alert, index) => (
+          <div 
+            key={index}
+            className={`
+              p-3 rounded-xl border-l-4
+              ${alert.severity === 'critical' ? 'border-l-red-500 bg-red-500/10' :
+                alert.severity === 'warning' ? 'border-l-orange-500 bg-orange-500/10' :
+                'border-l-blue-500 bg-blue-500/10'}
+            `}
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-white truncate">{alert.title}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{alert.camera}</p>
+              </div>
+              <span className="text-xs text-gray-500 whitespace-nowrap">{alert.time}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 // System health widget
 const SystemHealthWidget = () => {
+  const { t } = useTranslation();
+
   const systems = [
-    { name: 'Serveur IA', status: 'online', load: 45 },
-    { name: 'Base de données', status: 'online', load: 32 },
-    { name: 'Stockage', status: 'warning', load: 78 },
-    { name: 'Réseau', status: 'online', load: 15 },
+    { name: t('modernDashboard.systemHealth.systems.aiServer'), status: 'online', load: 45 },
+    { name: t('modernDashboard.systemHealth.systems.database'), status: 'online', load: 32 },
+    { name: t('modernDashboard.systemHealth.systems.storage'), status: 'warning', load: 78 },
+    { name: t('modernDashboard.systemHealth.systems.network'), status: 'online', load: 15 },
   ];
 
   return (
     <div className="rounded-2xl bg-dark-800/50 backdrop-blur-xl border border-dark-700 p-4">
       <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-4">
         <Activity size={16} className="text-primary" />
-        Santé système
+        {t('modernDashboard.systemHealth.title')}
       </h3>
       
       <div className="space-y-3">
@@ -195,6 +213,11 @@ const SystemHealthWidget = () => {
 
 // Main Dashboard Component
 const ModernDashboard = () => {
+  const { t } = useTranslation();
+  const { user } = useAuthStore();
+
+  const displayName = user?.first_name || user?.email?.split('@')?.[0] || '—';
+
   // Mock cameras data
   const cameras = [
     { id: 1, name: 'Entrée Principale', location: 'Bâtiment A', recording: true },
@@ -209,44 +232,44 @@ const ModernDashboard = () => {
 
   // Mock alerts data
   const alerts = [
-    { title: 'Intrusion détectée', camera: 'Zone Production', severity: 'critical', time: 'Il y a 2 min' },
-    { title: 'EPI non conforme', camera: 'Entrepôt', severity: 'warning', time: 'Il y a 5 min' },
-    { title: 'Mouvement nocturne', camera: 'Parking Nord', severity: 'warning', time: 'Il y a 12 min' },
-    { title: 'File d\'attente longue', camera: 'Hall Accueil', severity: 'info', time: 'Il y a 18 min' },
-    { title: 'Véhicule inconnu', camera: 'Parking Sud', severity: 'info', time: 'Il y a 25 min' },
+    { title: t('modernDashboard.mockAlerts.intrusionDetected'), camera: 'Zone Production', severity: 'critical', time: t('modernDashboard.time.minutesAgo', { count: 2 }) },
+    { title: t('modernDashboard.mockAlerts.ppeNonCompliant'), camera: 'Entrepôt', severity: 'warning', time: t('modernDashboard.time.minutesAgo', { count: 5 }) },
+    { title: t('modernDashboard.mockAlerts.nightMovement'), camera: 'Parking Nord', severity: 'warning', time: t('modernDashboard.time.minutesAgo', { count: 12 }) },
+    { title: t('modernDashboard.mockAlerts.longQueue'), camera: 'Hall Accueil', severity: 'info', time: t('modernDashboard.time.minutesAgo', { count: 18 }) },
+    { title: t('modernDashboard.mockAlerts.unknownVehicle'), camera: 'Parking Sud', severity: 'info', time: t('modernDashboard.time.minutesAgo', { count: 25 }) },
   ];
 
   const [viewMode, setViewMode] = useState('split'); // 'split', 'cameras', 'stats'
 
   return (
     <div className="h-full flex flex-col">
-      <DashboardHeader />
+      <DashboardHeader name={displayName} />
       
       {/* Quick stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <QuickStat 
           icon={Camera} 
           value="16/16" 
-          label="Caméras en ligne" 
+          label={t('modernDashboard.quickStats.camerasOnline')} 
           color="from-green-600/30 to-emerald-600/30"
         />
         <QuickStat 
           icon={Users} 
           value="47" 
-          label="Personnes détectées" 
+          label={t('modernDashboard.quickStats.peopleDetected')} 
           color="from-blue-600/30 to-cyan-600/30"
         />
         <QuickStat 
           icon={AlertTriangle} 
           value="3" 
-          label="Alertes actives" 
+          label={t('modernDashboard.quickStats.activeAlerts')} 
           color="from-orange-600/30 to-amber-600/30"
           pulse
         />
         <QuickStat 
           icon={Shield} 
           value="94%" 
-          label="Conformité EPI" 
+          label={t('modernDashboard.quickStats.ppeCompliance')} 
           color="from-purple-600/30 to-fuchsia-600/30"
         />
       </div>
@@ -260,7 +283,7 @@ const ModernDashboard = () => {
               viewMode === 'split' ? 'bg-primary text-white' : 'text-gray-400 hover:text-white'
             }`}
           >
-            Vue mixte
+            {t('modernDashboard.viewModes.split')}
           </button>
           <button
             onClick={() => setViewMode('cameras')}
@@ -268,7 +291,7 @@ const ModernDashboard = () => {
               viewMode === 'cameras' ? 'bg-primary text-white' : 'text-gray-400 hover:text-white'
             }`}
           >
-            Caméras
+            {t('modernDashboard.viewModes.cameras')}
           </button>
           <button
             onClick={() => setViewMode('stats')}
@@ -276,7 +299,7 @@ const ModernDashboard = () => {
               viewMode === 'stats' ? 'bg-primary text-white' : 'text-gray-400 hover:text-white'
             }`}
           >
-            Analytics
+            {t('modernDashboard.viewModes.analytics')}
           </button>
         </div>
         
@@ -284,7 +307,7 @@ const ModernDashboard = () => {
         
         <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-dark-800/50 backdrop-blur-sm border border-dark-700 text-gray-400 hover:text-white transition-colors">
           <Filter size={16} />
-          <span className="text-sm">Filtres</span>
+          <span className="text-sm">{t('modernDashboard.filters.button')}</span>
         </button>
       </div>
       

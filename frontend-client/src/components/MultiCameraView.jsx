@@ -3,13 +3,11 @@
  * Vue multi-caméras moderne avec overlay des détections en temps réel
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  Maximize2, Minimize2, Volume2, VolumeX, Settings, 
-  Grid, LayoutGrid, Square, Columns, Play, Pause,
-  ZoomIn, ZoomOut, Move, RotateCcw, Camera, AlertTriangle,
-  Users, Car, Flame, HardHat, Clock, TrendingUp,
-  ChevronLeft, ChevronRight, Mic, MicOff, Download,
+  Maximize2, Minimize2, Camera, AlertTriangle,
+  Users, Car, TrendingUp,
+  ChevronLeft, ChevronRight, Download,
   Fullscreen, PictureInPicture, RefreshCw, Eye, EyeOff
 } from 'lucide-react';
 
@@ -316,7 +314,7 @@ const MultiCameraView = ({ cameras = [] }) => {
             gridTemplateRows: `repeat(${layoutConfig.rows}, 1fr)`,
           }}
         >
-          {visibleCameras.map((camera, index) => (
+          {visibleCameras.map((camera) => (
             <CameraFeed
               key={camera.id}
               camera={camera}

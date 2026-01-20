@@ -18,11 +18,17 @@ import {
   Wifi,
   WifiOff,
   HardHat,
-  Flame,
-  Car
+  Flame
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAnalyticsStore, useCamerasStore, useAlertsStore } from '../services/store';
 import TutorialOverlay from '../components/TutorialOverlay';
+
+const getLocaleFromLanguage = (language) => {
+  if (language?.startsWith('en')) return 'en-US';
+  if (language?.startsWith('es')) return 'es-ES';
+  return 'fr-FR';
+};
 
 // Stat Card Component (Futuristic Update)
 const StatCard = ({ icon: Icon, label, value, trend, trendValue, color = 'primary' }) => {
@@ -61,6 +67,8 @@ const StatCard = ({ icon: Icon, label, value, trend, trendValue, color = 'primar
 
 // Camera Preview Card
 const CameraCard = ({ camera }) => {
+  const { t } = useTranslation();
+
   return (
     <Link to={`/cameras/${camera.id}`}>
       <motion.div
@@ -85,14 +93,14 @@ const CameraCard = ({ camera }) => {
               : 'bg-danger/10 text-danger border-danger/30'
           }`}>
             {camera.is_online ? <Wifi size={12} /> : <WifiOff size={12} />}
-            {camera.is_online ? 'ONLINE' : 'OFFLINE'}
+            {camera.is_online ? t('dashboard.cameraCard.status.online') : t('dashboard.cameraCard.status.offline')}
           </div>
           
           {/* Live indicator */}
           {camera.is_online && (
             <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 bg-danger/80 backdrop-blur rounded-sm text-xs font-bold shadow-[0_0_10px_rgba(239,68,68,0.5)]">
               <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-              LIVE
+              {t('dashboard.cameraCard.live')}
             </div>
           )}
           
@@ -105,23 +113,23 @@ const CameraCard = ({ camera }) => {
         {/* Info */}
         <div className="p-4 bg-dark-850/50 backdrop-blur-sm">
           <h3 className="font-semibold truncate">{camera.name}</h3>
-          <p className="text-sm text-gray-400 truncate">{camera.location || 'Aucun emplacement'}</p>
+          <p className="text-sm text-gray-400 truncate">{camera.location || t('dashboard.cameraCard.locationFallback')}</p>
           
           {/* Detection badges */}
           <div className="flex gap-2 mt-3">
             {camera.detection_config?.person_detection && (
               <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                👤 Personnes
+                👤 {t('dashboard.cameraCard.badges.people')}
               </span>
             )}
             {camera.detection_config?.fall_detection && (
               <span className="px-2 py-1 bg-warning/10 text-warning text-xs rounded-full">
-                ⬇️ Chute
+                ⬇️ {t('dashboard.cameraCard.badges.fall')}
               </span>
             )}
             {camera.detection_config?.ppe_detection && (
               <span className="px-2 py-1 bg-success/10 text-success text-xs rounded-full">
-                🦺 EPI
+                🦺 {t('dashboard.cameraCard.badges.ppe')}
               </span>
             )}
           </div>
@@ -133,6 +141,9 @@ const CameraCard = ({ camera }) => {
 
 // Alert Item
 const AlertItem = ({ alert }) => {
+  const { i18n } = useTranslation();
+  const locale = getLocaleFromLanguage(i18n.language);
+
   const severityColors = {
     critical: 'border-danger bg-danger/5',
     high: 'border-warning bg-warning/5',
@@ -160,7 +171,7 @@ const AlertItem = ({ alert }) => {
         <div className="flex-1 min-w-0">
           <p className="font-medium truncate">{alert.message}</p>
           <p className="text-sm text-gray-400">
-            {new Date(alert.created_at).toLocaleTimeString('fr-FR')}
+            {new Date(alert.created_at).toLocaleTimeString(locale)}
           </p>
         </div>
         {!alert.is_read && (
@@ -173,17 +184,19 @@ const AlertItem = ({ alert }) => {
 
 // Quick Actions
 const QuickActions = () => {
+  const { t } = useTranslation();
+
   const actions = [
-    { icon: Camera, label: 'Ajouter caméra', color: 'primary', path: '/cameras?add=true' },
-    { icon: HardHat, label: 'Vérifier EPI', color: 'success', path: '/analytics?type=ppe' },
-    { icon: Users, label: 'Comptage', color: 'purple', path: '/analytics?type=counting' },
-    { icon: Flame, label: 'Alertes feu', color: 'danger', path: '/alerts?type=fire' }
+    { icon: Camera, label: t('dashboard.quickActions.addCamera'), color: 'primary', path: '/cameras?add=true' },
+    { icon: HardHat, label: t('dashboard.quickActions.checkPpe'), color: 'success', path: '/analytics?type=ppe' },
+    { icon: Users, label: t('dashboard.quickActions.counting'), color: 'purple', path: '/analytics?type=counting' },
+    { icon: Flame, label: t('dashboard.quickActions.fireAlerts'), color: 'danger', path: '/alerts?type=fire' }
   ];
   
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       {actions.map((action) => (
-        <Link key={action.label} to={action.path}>
+        <Link key={action.path} to={action.path}>
           <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -200,7 +213,8 @@ const QuickActions = () => {
 
 // Main Dashboard
 export default function Dashboard() {
-  const { dashboard, fetchDashboard, isLoading } = useAnalyticsStore();
+  const { t } = useTranslation();
+  const { dashboard, fetchDashboard, isLoading: _isLoading } = useAnalyticsStore();
   const { cameras, fetchCameras } = useCamerasStore();
   const { alerts, fetchAlerts } = useAlertsStore();
   
@@ -225,16 +239,16 @@ export default function Dashboard() {
 
   const tutorialSteps = [
       {
-          title: "Bienvenue sur OhmVision",
-          content: "Votre interface de sécurité v3.0 est prête. Ce tableau de bord centralise l'intelligence de votre site."
+        title: t('dashboard.tutorial.step1.title'),
+        content: t('dashboard.tutorial.step1.content')
       },
       {
-          title: "Indicateurs Clés",
-          content: "Surveillez ici l'état de santé de vos caméras et le nombre d'alertes en temps réel."
+        title: t('dashboard.tutorial.step2.title'),
+        content: t('dashboard.tutorial.step2.content')
       },
       {
-          title: "Actions Rapides",
-          content: "Lancez des analyses ou générez des rapports en un clic depuis cette barre d'actions."
+        title: t('dashboard.tutorial.step3.title'),
+        content: t('dashboard.tutorial.step3.content')
       }
   ];
   
@@ -252,19 +266,19 @@ export default function Dashboard() {
       {/* Welcome */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">Bonjour ! 👋</h1>
-          <p className="text-gray-400">Système de sécurité actif - <span className="text-ohm-cyan font-mono">v3.0.1</span></p>
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">{t('dashboard.welcome.greeting')}</h1>
+          <p className="text-gray-400">{t('dashboard.welcome.status')} <span className="text-ohm-cyan font-mono">v3.0.1</span></p>
         </div>
         <div className="hidden md:flex items-center gap-3">
           <button 
              onClick={() => setShowTutorial(true)}
              className="text-xs font-mono text-ohm-cyan/70 hover:text-ohm-cyan underline underline-offset-4"
           >
-             TUTORIAL_MODE
+             {t('dashboard.actions.tutorialMode')}
           </button>
           <div className="px-3 py-1 rounded bg-success/10 border border-success/30 text-success text-sm flex items-center gap-2">
             <Activity size={16} />
-            <span>SYSTÈME ONLINE</span>
+            <span>{t('dashboard.system.online')}</span>
           </div>
         </div>
       </div>
@@ -273,7 +287,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           icon={Camera}
-          label="Caméras en ligne"
+          label={t('dashboard.stats.camerasOnline')}
           value={`${stats.cameras.online}/${stats.cameras.total}`}
           trend={stats.cameras.online === stats.cameras.total ? 'up' : 'down'}
           trendValue={`${Math.round((stats.cameras.online / stats.cameras.total) * 100) || 0}%`}
@@ -281,13 +295,13 @@ export default function Dashboard() {
         />
         <StatCard
           icon={Bell}
-          label="Alertes aujourd'hui"
+          label={t('dashboard.stats.alertsToday')}
           value={stats.alerts.today}
           color={stats.alerts.critical > 0 ? 'danger' : 'primary'}
         />
         <StatCard
           icon={Users}
-          label="Entrées"
+          label={t('dashboard.stats.entries')}
           value={stats.counting.entries_today}
           trend="up"
           trendValue="+12%"
@@ -295,17 +309,17 @@ export default function Dashboard() {
         />
         <StatCard
           icon={HardHat}
-          label="Conformité EPI"
+          label={t('dashboard.stats.ppeCompliance')}
           value={`${stats.ppe.compliance_rate}%`}
           trend={stats.ppe.compliance_rate >= 90 ? 'up' : 'down'}
-          trendValue={stats.ppe.compliance_rate >= 90 ? 'OK' : 'Attention'}
+          trendValue={stats.ppe.compliance_rate >= 90 ? t('dashboard.stats.ok') : t('dashboard.stats.attention')}
           color={stats.ppe.compliance_rate >= 90 ? 'success' : 'warning'}
         />
       </div>
       
       {/* Quick Actions */}
       <div>
-        <h2 className="font-semibold mb-3">Actions rapides</h2>
+        <h2 className="font-semibold mb-3">{t('dashboard.quickActions.title')}</h2>
         <QuickActions />
       </div>
       
@@ -314,22 +328,22 @@ export default function Dashboard() {
         {/* Cameras */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold">Mes caméras</h2>
+            <h2 className="font-semibold">{t('dashboard.cameras.title')}</h2>
             <Link to="/cameras" className="text-primary text-sm flex items-center gap-1 hover:underline">
-              Voir tout <ChevronRight size={16} />
+              {t('dashboard.actions.viewAll')} <ChevronRight size={16} />
             </Link>
           </div>
           
           {cameras.length === 0 ? (
             <div className="bg-dark-800 rounded-2xl p-8 text-center border border-dark-600">
               <Camera size={48} className="mx-auto text-gray-600 mb-4" />
-              <h3 className="font-semibold mb-2">Aucune caméra</h3>
-              <p className="text-gray-400 mb-4">Ajoutez votre première caméra pour commencer</p>
+              <h3 className="font-semibold mb-2">{t('dashboard.cameras.empty.title')}</h3>
+              <p className="text-gray-400 mb-4">{t('dashboard.cameras.empty.subtitle')}</p>
               <Link
                 to="/cameras?add=true"
                 className="inline-block bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-xl transition-colors"
               >
-                Ajouter une caméra
+                {t('dashboard.cameras.empty.addButton')}
               </Link>
             </div>
           ) : (
@@ -344,9 +358,9 @@ export default function Dashboard() {
         {/* Alerts */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold">Alertes récentes</h2>
+            <h2 className="font-semibold">{t('dashboard.alerts.title')}</h2>
             <Link to="/alerts" className="text-primary text-sm flex items-center gap-1 hover:underline">
-              Voir tout <ChevronRight size={16} />
+              {t('dashboard.actions.viewAll')} <ChevronRight size={16} />
             </Link>
           </div>
           
@@ -354,7 +368,7 @@ export default function Dashboard() {
             {alerts.length === 0 ? (
               <div className="bg-dark-800 rounded-2xl p-6 text-center border border-dark-600">
                 <Bell size={32} className="mx-auto text-gray-600 mb-3" />
-                <p className="text-gray-400">Aucune alerte récente</p>
+                <p className="text-gray-400">{t('dashboard.alerts.empty')}</p>
               </div>
             ) : (
               alerts.slice(0, 5).map((alert) => (
@@ -374,9 +388,9 @@ export default function Dashboard() {
                 <AlertTriangle className="text-danger" />
                 <div>
                   <p className="font-semibold text-danger">
-                    {stats.alerts.critical} alerte{stats.alerts.critical > 1 ? 's' : ''} critique{stats.alerts.critical > 1 ? 's' : ''}
+                    {t('dashboard.alerts.critical', { count: stats.alerts.critical })}
                   </p>
-                  <p className="text-sm text-gray-400">Action immédiate requise</p>
+                  <p className="text-sm text-gray-400">{t('dashboard.alerts.actionRequired')}</p>
                 </div>
               </div>
             </motion.div>

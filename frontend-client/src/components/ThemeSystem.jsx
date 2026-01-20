@@ -248,7 +248,7 @@ export const useTheme = () => {
 
 // Theme toggle button component
 export const ThemeToggle = ({ className = '' }) => {
-  const { theme, setTheme, isDark } = useTheme();
+  const { setTheme, isDark } = useTheme();
   
   const toggleTheme = () => {
     setTheme(isDark ? 'light' : 'dark');
@@ -274,7 +274,7 @@ export const ThemeToggle = ({ className = '' }) => {
 };
 
 // Theme selector panel component
-export const ThemeSelector = ({ onClose }) => {
+export const ThemeSelector = ({ onClose: _onClose }) => {
   const { theme, setTheme, accentColor, setAccentColor, themes, accents } = useTheme();
 
   return (

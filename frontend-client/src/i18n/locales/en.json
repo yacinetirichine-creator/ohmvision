@@ -2,6 +2,15 @@
   "common": {
     "brand": "OhmVision",
     "loading": "Loading OhmVision...",
+    "na": "N/A",
+    "close": "Close",
+    "cancel": "Cancel",
+    "add": "Add",
+    "view": "View",
+    "settings": "Settings",
+    "delete": "Delete",
+    "active": "Active",
+    "inactive": "Inactive",
     "language": "Language",
     "languages": {
       "fr": "French",
@@ -77,6 +86,18 @@
   },
   "legal": {
     "backHome": "Back to home",
+    "lastUpdated": "Last updated: {{date}}",
+    "footer": {
+      "copyright": "© 2026 OhmTronic SAS - All rights reserved"
+    },
+    "pages": {
+      "mentions": "Legal Notice",
+      "privacy": "Privacy Policy",
+      "cgu": "Terms of Use",
+      "cgv": "Terms of Sale",
+      "gdpr": "GDPR Compliance",
+      "contractPolicy": "Contract Policy"
+    },
     "links": {
       "mentions": "Legal Notice",
       "privacy": "Privacy",
@@ -85,5 +106,866 @@
       "gdpr": "GDPR"
     },
     "noticeFrenchOnly": "Note: for legal accuracy, the French version is authoritative. English and Spanish translations can be added on request via a legal translator."
+  },
+  "auth": {
+    "fields": {
+      "email": "Email",
+      "password": "Password"
+    },
+    "placeholders": {
+      "email": "you@example.com",
+      "password": "••••••••"
+    },
+    "errors": {
+      "loginFailed": "Login failed"
+    },
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Sign in to access your dashboard",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "loading": "Signing in...",
+      "submit": "Sign in",
+      "demoAccount": "Demo account:"
+    }
+  }
+  ,
+  "alerts": {
+    "title": "Alerts",
+    "unreadSummary": "{{unread}} unread out of {{total}}",
+    "searchPlaceholder": "Search an alert...",
+    "empty": "No alerts",
+    "date": {
+      "today": "Today"
+    },
+    "types": {
+      "person_detected": "Person detected",
+      "fall_detected": "Fall",
+      "ppe_missing": "PPE missing",
+      "fire_detected": "Fire",
+      "intrusion": "Intrusion",
+      "vehicle_detected": "Vehicle"
+    },
+    "severity": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "status": {
+      "unread": "Unread",
+      "read": "Read",
+      "resolved": "Resolved",
+      "resolvedLabel": "Resolved"
+    },
+    "filters": {
+      "button": "Filters",
+      "allTypes": "All types",
+      "allSeverities": "All severities",
+      "allStatuses": "All statuses",
+      "allCameras": "All cameras",
+      "reset": "Reset filters"
+    },
+    "actions": {
+      "markAllRead": "Mark all as read",
+      "resolveTitle": "Resolve",
+      "markResolved": "Mark as resolved"
+    },
+    "cameraFallback": "Camera {{id}}",
+    "detail": {
+      "title": "Alert details",
+      "fields": {
+        "type": "Type",
+        "severity": "Severity",
+        "date": "Date",
+        "camera": "Camera",
+        "snapshot": "Snapshot",
+        "data": "Data"
+      },
+      "snapshotAlt": "Alert snapshot"
+    }
+  },
+  "cameras": {
+    "title": "Cameras",
+    "count_one": "1 camera",
+    "count_other": "{{count}} cameras",
+    "onlineCount_one": "{{count}} online",
+    "onlineCount_other": "{{count}} online",
+    "offlineCount_one": "{{count}} offline",
+    "offlineCount_other": "{{count}} offline",
+    "searchPlaceholder": "Search a camera...",
+    "status": {
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "notConfigured": "Not configured",
+    "filters": {
+      "all": "All",
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "empty": {
+      "noResultsTitle": "No results",
+      "noCamerasTitle": "No cameras",
+      "noResultsSubtitle": "Try changing your filters",
+      "noCamerasSubtitle": "Add your first camera to get started"
+    },
+    "actions": {
+      "addCamera": "Add a camera"
+    },
+    "badges": {
+      "people": "People",
+      "counting": "Counting",
+      "fall": "Fall",
+      "ppe": "PPE"
+    },
+    "addModal": {
+      "title": "Add a camera",
+      "fields": {
+        "nameRequired": "Camera name *",
+        "location": "Location",
+        "ipAddress": "IP address",
+        "rtspPort": "RTSP port",
+        "rtspUrlOptional": "RTSP URL (optional)",
+        "username": "Username",
+        "password": "Password"
+      },
+      "placeholders": {
+        "name": "e.g. Main entrance",
+        "location": "e.g. Building A, ground floor"
+      }
+    }
+  },
+  "setupWizard": {
+    "loading": "Loading...",
+    "header": {
+      "subtitle": "Set up your smart video surveillance system"
+    },
+    "steps": {
+      "welcome": "Welcome",
+      "admin": "Administrator",
+      "cameras": "Cameras",
+      "detections": "Detections",
+      "complete": "Done"
+    },
+    "actions": {
+      "start": "Get started →",
+      "back": "← Back",
+      "next": "Continue →"
+    },
+    "errors": {
+      "passwordMismatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least {{min}} characters",
+      "createAccountFailed": "Failed to create account",
+      "addAtLeastOneCamera": "Please add at least one camera",
+      "addCamerasFailed": "Failed to add cameras",
+      "networkScanFailed": "Network scan failed",
+      "enterIpAddress": "Please enter an IP address",
+      "cameraTestFailed": "Camera test failed"
+    },
+    "welcome": {
+      "title": "Welcome to OhmVision",
+      "subtitle": "Let's configure your smart surveillance system in a few simple steps.",
+      "cards": {
+        "admin": "Create an admin account",
+        "scan": "Scan your cameras",
+        "ai": "Configure AI",
+        "ready": "You're all set!"
+      }
+    },
+    "admin": {
+      "title": "Create the administrator account",
+      "subtitle": "This account lets you manage OhmVision.",
+      "fields": {
+        "fullName": "Full name",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm password",
+        "companyNameOptional": "Company name (optional)"
+      },
+      "placeholders": {
+        "fullName": "Jane Doe",
+        "email": "admin@example.com",
+        "password": "••••••••",
+        "companyName": "My Company"
+      }
+    },
+    "cameras": {
+      "title": "Find your cameras",
+      "subtitle": "OhmVision can scan your network to automatically discover your cameras.",
+      "defaultName": "Camera {{ip}}",
+      "scan": {
+        "start": "Scan network",
+        "scanning": "Scanning... {{progress}}%"
+      },
+      "manual": {
+        "toggle": "Add manually",
+        "title": "Add a camera manually",
+        "testing": "Testing...",
+        "placeholders": {
+          "name": "Name (e.g. Entrance)",
+          "ip": "IP address",
+          "username": "Username (admin)",
+          "password": "Password",
+          "rtspUrl": "RTSP URL (optional, auto-detected)"
+        }
+      },
+      "detectedDevicesTitle": "Detected devices ({{count}})",
+      "labels": {
+        "onvif": "ONVIF",
+        "rtspOk": "RTSP OK"
+      },
+      "actions": {
+        "test": "Test"
+      },
+      "selectedCount_one": "{{count}} camera selected",
+      "selectedCount_other": "{{count}} cameras selected",
+      "selectedCount": "{{count}} cameras selected"
+    },
+    "detections": {
+      "title": "Configure AI detections",
+      "subtitle": "Choose which analyses to enable for each camera.",
+      "enableAllTitle": "Enable for all cameras:",
+      "types": {
+        "person": {
+          "label": "Person detection",
+          "description": "Detects people in the field of view"
+        },
+        "fall": {
+          "label": "Fall detection",
+          "description": "Alerts when a person falls"
+        },
+        "fire": {
+          "label": "Fire/smoke detection",
+          "description": "Detects fire outbreaks and smoke"
+        },
+        "ppe": {
+          "label": "PPE detection",
+          "description": "Checks helmet and safety vest"
+        },
+        "counting": {
+          "label": "Counting",
+          "description": "Counts entries and exits"
+        }
+      }
+    },
+    "complete": {
+      "title": "Setup complete!",
+      "subtitle": "Your OhmVision system is ready. Your cameras are configured and AI analytics are enabled.",
+      "whatsNextTitle": "What's next:",
+      "whatsNext": {
+        "items": {
+          "realtimeDashboard": "Real-time dashboard",
+          "instantAlerts": "Instant alerts",
+          "ai247": "24/7 AI analytics",
+          "eventHistory": "Event history"
+        }
+      },
+      "finishing": "Finalizing...",
+      "openDashboard": "Open Dashboard →"
+    }
+  },
+  "dashboard": {
+    "welcome": {
+      "greeting": "Hello! 👋",
+      "status": "Security system active -"
+    },
+    "actions": {
+      "tutorialMode": "TUTORIAL_MODE",
+      "viewAll": "View all"
+    },
+    "system": {
+      "online": "SYSTEM ONLINE"
+    },
+    "tutorial": {
+      "step1": {
+        "title": "Welcome to OhmVision",
+        "content": "Your v3.0 security interface is ready. This dashboard centralizes your site's intelligence."
+      },
+      "step2": {
+        "title": "Key indicators",
+        "content": "Monitor your camera health and the number of real-time alerts here."
+      },
+      "step3": {
+        "title": "Quick actions",
+        "content": "Launch analyses or generate reports in one click from this action bar."
+      }
+    },
+    "stats": {
+      "camerasOnline": "Cameras online",
+      "alertsToday": "Alerts today",
+      "entries": "Entries",
+      "ppeCompliance": "PPE compliance",
+      "ok": "OK",
+      "attention": "Attention"
+    },
+    "quickActions": {
+      "title": "Quick actions",
+      "addCamera": "Add camera",
+      "checkPpe": "Check PPE",
+      "counting": "Counting",
+      "fireAlerts": "Fire alerts"
+    },
+    "cameras": {
+      "title": "My cameras",
+      "empty": {
+        "title": "No cameras",
+        "subtitle": "Add your first camera to get started",
+        "addButton": "Add a camera"
+      }
+    },
+    "cameraCard": {
+      "status": {
+        "online": "ONLINE",
+        "offline": "OFFLINE"
+      },
+      "live": "LIVE",
+      "locationFallback": "No location",
+      "badges": {
+        "people": "People",
+        "fall": "Fall",
+        "ppe": "PPE"
+      }
+    },
+    "alerts": {
+      "title": "Recent alerts",
+      "empty": "No recent alerts",
+      "critical_one": "{{count}} critical alert",
+      "critical_other": "{{count}} critical alerts",
+      "actionRequired": "Immediate action required"
+    }
+  },
+  "executiveDashboard": {
+    "title": "Executive Dashboard",
+    "subtitle": "Overview of OhmVision performance",
+    "period": {
+      "today": "Today",
+      "week": "This week",
+      "month": "This month"
+    },
+    "actions": {
+      "exportPdf": "Export PDF"
+    },
+    "kpis": {
+      "main": {
+        "totalAlerts": "Total alerts",
+        "criticalAlerts": "Critical alerts",
+        "uptime": "Uptime",
+        "responseTime": "Response time"
+      },
+      "secondary": {
+        "ppeCompliance": "PPE compliance",
+        "visitors": "Visitors",
+        "incidentsPrevented": "Incidents prevented",
+        "savings": "Savings"
+      }
+    },
+    "charts": {
+      "alertsBySeverity": {
+        "title": "Alert distribution",
+        "critical": "Critical",
+        "high": "High",
+        "warnings": "Warnings"
+      }
+    },
+    "sections": {
+      "topCameras": "Most active cameras",
+      "recentIncidents": "Recent incidents"
+    },
+    "common": {
+      "alertsCount_one": "{{count}} alert",
+      "alertsCount_other": "{{count}} alerts"
+    },
+    "insights": {
+      "title": "AI insights",
+      "cards": {
+        "activitySpike": {
+          "title": "Activity spike detected",
+          "description": "45% increase in alerts between 2pm and 4pm. Recommendation: strengthen monitoring."
+        },
+        "ppeImprovement": {
+          "title": "PPE improvement",
+          "description": "Compliance increased by 15% this month thanks to the new measures."
+        },
+        "riskZone": {
+          "title": "Risk area",
+          "description": "The storage area generates 35% of alerts. Deeper analysis recommended."
+        }
+      }
+    },
+    "quickActions": {
+      "generateReport": {
+        "title": "Generate report",
+        "description": "Create a full PDF report"
+      },
+      "viewAllAlerts": {
+        "title": "View all alerts",
+        "description": "Access the full history"
+      },
+      "configureNotifications": {
+        "title": "Configure notifications",
+        "description": "Manage alert channels"
+      },
+      "industryAnalytics": {
+        "title": "Industry analytics",
+        "description": "Industry-specific insights"
+      }
+    }
+  },
+  "modernDashboard": {
+    "header": {
+      "greeting": "Hello, {{name}} 👋"
+    },
+    "weather": {
+      "city": "Paris"
+    },
+    "actions": {
+      "viewAll": "View all"
+    },
+    "quickStats": {
+      "camerasOnline": "Cameras online",
+      "peopleDetected": "People detected",
+      "activeAlerts": "Active alerts",
+      "ppeCompliance": "PPE compliance"
+    },
+    "viewModes": {
+      "split": "Split view",
+      "cameras": "Cameras",
+      "analytics": "Analytics"
+    },
+    "filters": {
+      "button": "Filters"
+    },
+    "siteMap": {
+      "title": "Site map",
+      "placeholder": {
+        "title": "Interactive map",
+        "subtitle": "Coming soon"
+      }
+    },
+    "recentAlerts": {
+      "title": "Recent alerts"
+    },
+    "systemHealth": {
+      "title": "System health",
+      "systems": {
+        "aiServer": "AI server",
+        "database": "Database",
+        "storage": "Storage",
+        "network": "Network"
+      }
+    },
+    "time": {
+      "minutesAgo_one": "{{count}} min ago",
+      "minutesAgo_other": "{{count}} mins ago"
+    },
+    "mockAlerts": {
+      "intrusionDetected": "Intrusion detected",
+      "ppeNonCompliant": "PPE non-compliant",
+      "nightMovement": "Night movement",
+      "longQueue": "Long queue",
+      "unknownVehicle": "Unknown vehicle"
+    }
+  },
+  "analytics": {
+    "title": "Statistics",
+    "subtitle": "Analyze your data",
+    "filters": {
+      "allCameras": "All cameras"
+    },
+    "periods": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "weekDays": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "metrics": {
+      "entries": "Entries",
+      "exits": "Exits"
+    },
+    "stats": {
+      "totalEntries": "Total entries",
+      "totalExits": "Total exits",
+      "peakTraffic": "Peak traffic",
+      "peakAt": "at {{time}}",
+      "alerts": "Alerts",
+      "vsPreviousPeriod": "vs previous period"
+    },
+    "charts": {
+      "peopleFlow": "People flow",
+      "weeklyComparison": "Weekly comparison",
+      "alertsByType": "Alerts by type",
+      "peakHours": "Peak hours",
+      "ppeCompliance": "PPE compliance"
+    },
+    "alertsByType": {
+      "persons": "People",
+      "falls": "Falls",
+      "ppe": "PPE",
+      "intrusion": "Intrusion",
+      "fire": "Fire"
+    },
+    "peakHours": {
+      "lunchBreak": "Lunch break",
+      "endOfDay": "End of day",
+      "morningArrival": "Morning arrival",
+      "afternoon": "Afternoon"
+    },
+    "ppe": {
+      "statusCompliant": "Compliant",
+      "helmetsDetected": "Helmets detected",
+      "vestsDetected": "Vests detected",
+      "nonCompliances": "Non-compliance"
+    },
+    "heatmap": {
+      "title": "Heatmap",
+      "periods": {
+        "today": "Today",
+        "thisWeek": "This week",
+        "thisMonth": "This month"
+      },
+      "placeholderTitle": "Movement heatmap",
+      "placeholderSubtitle": "Available with Business+ plans"
+    }
+  },
+  "cameraView": {
+    "common": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "status": {
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "overlay": {
+      "peopleCount_one": "{{count}} person",
+      "peopleCount_other": "{{count}} people"
+    },
+    "badges": {
+      "fall": "Fall",
+      "ppe": "PPE",
+      "fire": "Fire"
+    },
+    "quickStats": {
+      "people": "People",
+      "entries": "Entries",
+      "exits": "Exits",
+      "alerts": "Alerts"
+    },
+    "detections": {
+      "title": "AI detections",
+      "person": {
+        "label": "Person detection",
+        "description": "Automatically detects people in the stream"
+      },
+      "counting": {
+        "label": "Counting",
+        "description": "Counts entries and exits"
+      },
+      "fall": {
+        "label": "Fall detection",
+        "description": "Detects falls and alerts immediately"
+      },
+      "ppe": {
+        "label": "PPE compliance",
+        "description": "Detects missing protective equipment"
+      },
+      "fire": {
+        "label": "Fire detection",
+        "description": "Detects smoke and fire"
+      }
+    },
+    "recentAlerts": {
+      "title": "Recent alerts",
+      "empty": "No recent alerts"
+    },
+    "info": {
+      "title": "Information",
+      "ip": "IP",
+      "resolution": "Resolution",
+      "fps": "FPS",
+      "lastActivity": "Last activity"
+    },
+    "notifications": {
+      "configUpdated": {
+        "title": "Configuration updated",
+        "message": "Feature “{{feature}}” is now {{state}}."
+      }
+    }
+  },
+  "notificationsConfig": {
+    "title": "Notifications",
+    "subtitle": "Manage your notification channels",
+    "actions": {
+      "addChannel": "Add channel",
+      "test": "Test",
+      "adding": "Adding..."
+    },
+    "empty": {
+      "title": "No channel configured",
+      "cta": "Add your first channel"
+    },
+    "minimumSeverity": "Minimum severity",
+    "detailsPlaceholder": "Details",
+    "confirmDelete": "Delete “{{name}}”?",
+    "testMessage": "OhmVision test message",
+    "modal": {
+      "title": "Add channel",
+      "fields": {
+        "name": "Name",
+        "channelType": "Channel type",
+        "minimumSeverity": "Minimum severity",
+        "alertTypes": "Alert types"
+      },
+      "placeholders": {
+        "name": "e.g. On-call"
+      }
+    },
+    "channels": {
+      "email": "Email",
+      "telegram": "Telegram",
+      "discord": "Discord",
+      "sms": "SMS",
+      "slack": "Slack",
+      "teams": "Microsoft Teams",
+      "webhook": "Webhook"
+    },
+    "severity": {
+      "info": "Info",
+      "warning": "Warning",
+      "high": "High",
+      "critical": "Critical"
+    },
+    "alertTypes": {
+      "fall": "Fall",
+      "fire": "Fire",
+      "intrusion": "Intrusion",
+      "ppeViolation": "PPE violation",
+      "crowd": "Crowd",
+      "loitering": "Loitering",
+      "running": "Running",
+      "fighting": "Fighting"
+    },
+    "channelConfig": {
+      "email": {
+        "toEmail": "Recipient email",
+        "smtpHost": "SMTP host"
+      },
+      "telegram": {
+        "botToken": "Bot token",
+        "chatId": "Chat ID"
+      },
+      "discord": {
+        "webhookUrl": "Webhook URL"
+      },
+      "webhook": {
+        "url": "URL"
+      }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your preferences and account",
+    "tabs": {
+      "profile": "Profile",
+      "notifications": "Notifications",
+      "security": "Security",
+      "appearance": "Appearance",
+      "billing": "Billing",
+      "help": "Help"
+    },
+    "profile": {
+      "title": "Personal information",
+      "subtitle": "Update your profile information",
+      "changePhoto": "Change photo",
+      "photoHint": "JPG, PNG. Max 2MB",
+      "fields": {
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Email",
+        "phone": "Phone"
+      },
+      "placeholders": {
+        "phone": "+1 555 000 0000"
+      },
+      "save": "Save"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Choose how you want to be notified",
+      "channels": {
+        "title": "Notification channels",
+        "email": {
+          "title": "Email notifications",
+          "subtitle": "Receive alerts by email"
+        },
+        "sms": {
+          "title": "SMS notifications",
+          "subtitle": "Receive alerts by SMS"
+        },
+        "push": {
+          "title": "Push notifications",
+          "subtitle": "In-app notifications"
+        }
+      },
+      "severity": {
+        "title": "Alert levels",
+        "levels": {
+          "critical": "Critical",
+          "high": "High",
+          "medium": "Medium",
+          "low": "Low"
+        }
+      },
+      "reports": {
+        "title": "Automated reports",
+        "daily": "Daily report",
+        "weekly": "Weekly report"
+      }
+    },
+    "security": {
+      "title": "Security",
+      "subtitle": "Manage your account security",
+      "password": {
+        "title": "Password",
+        "lastChanged": "Last changed 30 days ago",
+        "edit": "Edit"
+      },
+      "twoFactor": {
+        "title": "Two-factor authentication",
+        "subtitle": "Secure your account with 2FA",
+        "enable": "Enable"
+      },
+      "sessions": {
+        "title": "Active sessions",
+        "current": "Current session",
+        "disconnect": "Sign out"
+      }
+    },
+    "appearance": {
+      "title": "Appearance",
+      "subtitle": "Customize the interface",
+      "theme": {
+        "title": "Theme",
+        "dark": "Dark",
+        "light": "Light"
+      },
+      "language": {
+        "title": "Language"
+      }
+    },
+    "billing": {
+      "title": "Billing",
+      "subtitle": "Manage your plan and billing",
+      "currentPlan": {
+        "label": "Current plan",
+        "price": "Price",
+        "nextPayment": "Next payment",
+        "cameras": "Cameras",
+        "users": "Users",
+        "change": "Change plan"
+      },
+      "paymentMethod": {
+        "title": "Payment method",
+        "expires": "Expires {{date}}",
+        "edit": "Edit"
+      },
+      "invoices": {
+        "title": "Billing history",
+        "download": "Download"
+      }
+    },
+    "help": {
+      "title": "Help & Support",
+      "subtitle": "Need help? We’re here for you",
+      "cards": {
+        "documentation": {
+          "title": "Documentation",
+          "desc": "Guides and tutorials"
+        },
+        "faq": {
+          "title": "FAQ",
+          "desc": "Frequently asked questions"
+        },
+        "support": {
+          "title": "Contact support",
+          "desc": "Open a ticket"
+        },
+        "status": {
+          "title": "Service status",
+          "desc": "System status"
+        }
+      },
+      "appVersion": "App version"
+    }
+  }
+  ,
+  "aiAssistant": {
+    "status": {
+      "analyzing": "Analyzing...",
+      "ready": "Ready to help"
+    },
+    "actions": {
+      "clearConversation": "Clear conversation"
+    },
+    "empty": {
+      "title": "How can I help you?",
+      "subtitle": "I can analyze your video feeds, optimize detection settings, or generate security reports."
+    },
+    "input": {
+      "placeholder": "Ask a question about your security system..."
+    },
+    "quickActions": {
+      "diagnostic": {
+        "title": "System diagnostic",
+        "description": "Full analysis of all cameras"
+      },
+      "optimize": {
+        "title": "Optimize detections",
+        "description": "Reduce false positives automatically"
+      },
+      "report": {
+        "title": "Generate a report",
+        "description": "Last week's report"
+      },
+      "help": {
+        "title": "Help & tips",
+        "description": "Discover available features"
+      }
+    },
+    "quickActionMessages": {
+      "optimize": "Optimize my cameras to reduce false positives",
+      "report": "Generate a report for last week",
+      "help": "What features are available?"
+    },
+    "suggestions": {
+      "cameraOffline": "Why is my Entry camera offline?",
+      "fallConfig": "How do I configure fall detection?",
+      "criticalAlertsToday": "Show me today's critical alerts",
+      "peakTraffic": "What are the peak traffic hours?"
+    },
+    "sidebar": {
+      "systemStatus": {
+        "title": "SYSTEM STATUS",
+        "cpuLoad": "AI CPU load",
+        "bandwidth": "Bandwidth"
+      },
+      "suggestions": {
+        "title": "SUGGESTIONS",
+        "items": {
+          "optimizeCamera04": "Optimize camera #04",
+          "checkLastNightLogs": "Check last night logs",
+          "exportIncident2230": "Export incident 22:30"
+        }
+      }
+    }
   }
 }

@@ -5,9 +5,9 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  Users, Car, Flame, HardHat, AlertTriangle, TrendingUp,
-  TrendingDown, Activity, Clock, Shield, Eye, Zap,
-  ThermometerSun, Wind, Camera, Bell
+  Users, Car, HardHat, AlertTriangle, TrendingUp,
+  TrendingDown, Activity, Eye,
+  ThermometerSun, Camera
 } from 'lucide-react';
 
 // Mini sparkline chart component
@@ -270,13 +270,13 @@ const RealTimeStats = () => {
     compliance: [91, 92, 93, 92, 94, 93, 94],
   });
   
-  const [alerts, setAlerts] = useState([
+  const [alerts, _setAlerts] = useState([
     { severity: 'critical', message: 'Intrusion zone restreinte', camera: 'Entrée Nord', time: 'Il y a 2 min' },
     { severity: 'warning', message: 'EPI non conforme détecté', camera: 'Atelier B', time: 'Il y a 5 min' },
     { severity: 'info', message: 'File d\'attente > 5 personnes', camera: 'Accueil', time: 'Il y a 8 min' },
   ]);
   
-  const [events, setEvents] = useState([
+  const [events, _setEvents] = useState([
     { type: 'person', message: 'Nouvelle personne détectée', camera: 'Hall principal', time: '10:45' },
     { type: 'vehicle', message: 'Véhicule entré parking', camera: 'Parking A', time: '10:43' },
     { type: 'alert', message: 'Mouvement zone interdite', camera: 'Entrepôt', time: '10:40' },
@@ -380,34 +380,3 @@ const RealTimeStats = () => {
 };
 
 export default RealTimeStats;
-
-// Custom scrollbar styles (add to index.css)
-const styles = `
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.1);
-  border-radius: 2px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.2);
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-.animate-slideIn {
-  animation: slideIn 0.3s ease-out forwards;
-}
-`;

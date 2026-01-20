@@ -4,17 +4,19 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   TrendingUp, TrendingDown, AlertTriangle, Users, Shield, 
-  Camera, Clock, DollarSign, Activity, Eye, Download,
-  BarChart2, PieChart, Calendar, ChevronRight, Bell,
-  Zap, Target, Award, AlertCircle
+  Camera, Clock, DollarSign, Activity, Download,
+  BarChart2, PieChart, ChevronRight, Bell,
+  Zap, Target, AlertCircle
 } from 'lucide-react';
 
 const ExecutiveDashboard = () => {
+  const { t } = useTranslation();
   const [period, setPeriod] = useState('today');
   const [kpis, setKpis] = useState(null);
-  const [trends, setTrends] = useState(null);
+  const [_trends, setTrends] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,8 +52,8 @@ const ExecutiveDashboard = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard Exécutif</h1>
-          <p className="text-gray-500">Vue d'ensemble des performances OhmVision</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('executiveDashboard.title')}</h1>
+          <p className="text-gray-500">{t('executiveDashboard.subtitle')}</p>
         </div>
         
         <div className="flex items-center gap-4">
@@ -61,15 +63,15 @@ const ExecutiveDashboard = () => {
             onChange={(e) => setPeriod(e.target.value)}
             className="px-4 py-2 border rounded-lg bg-white"
           >
-            <option value="today">Aujourd'hui</option>
-            <option value="week">Cette semaine</option>
-            <option value="month">Ce mois</option>
+            <option value="today">{t('executiveDashboard.period.today')}</option>
+            <option value="week">{t('executiveDashboard.period.week')}</option>
+            <option value="month">{t('executiveDashboard.period.month')}</option>
           </select>
           
           {/* Export */}
           <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
             <Download size={18} />
-            Exporter PDF
+            {t('executiveDashboard.actions.exportPdf')}
           </button>
         </div>
       </div>
@@ -77,28 +79,28 @@ const ExecutiveDashboard = () => {
       {/* KPIs Principaux */}
       <div className="grid grid-cols-4 gap-4">
         <KPICard 
-          title="Alertes Totales"
+          title={t('executiveDashboard.kpis.main.totalAlerts')}
           value={kpis?.kpis?.total_alerts?.value || 0}
           trend={kpis?.kpis?.total_alerts?.trend_pct}
           icon={AlertTriangle}
           color="orange"
         />
         <KPICard 
-          title="Alertes Critiques"
+          title={t('executiveDashboard.kpis.main.criticalAlerts')}
           value={kpis?.kpis?.critical_alerts?.value || 0}
           trend={kpis?.kpis?.critical_alerts?.trend_pct}
           icon={AlertCircle}
           color="red"
         />
         <KPICard 
-          title="Disponibilité"
+          title={t('executiveDashboard.kpis.main.uptime')}
           value={`${kpis?.kpis?.uptime?.value || 0}%`}
           trend={kpis?.kpis?.uptime?.trend}
           icon={Activity}
           color="green"
         />
         <KPICard 
-          title="Temps de Réponse"
+          title={t('executiveDashboard.kpis.main.responseTime')}
           value={`${kpis?.kpis?.avg_response_time?.value || 0}s`}
           trend={kpis?.kpis?.avg_response_time?.trend}
           icon={Clock}
@@ -110,28 +112,28 @@ const ExecutiveDashboard = () => {
       {/* KPIs Secondaires */}
       <div className="grid grid-cols-4 gap-4">
         <KPICard 
-          title="Conformité EPI"
+          title={t('executiveDashboard.kpis.secondary.ppeCompliance')}
           value={`${kpis?.kpis?.ppe_compliance?.value || 0}%`}
           trend={kpis?.kpis?.ppe_compliance?.trend}
           icon={Shield}
           color="purple"
         />
         <KPICard 
-          title="Visiteurs"
+          title={t('executiveDashboard.kpis.secondary.visitors')}
           value={kpis?.kpis?.visitor_count?.value || 0}
           trend={kpis?.kpis?.visitor_count?.trend_pct}
           icon={Users}
           color="cyan"
         />
         <KPICard 
-          title="Incidents Évités"
+          title={t('executiveDashboard.kpis.secondary.incidentsPrevented')}
           value={kpis?.kpis?.incidents_prevented?.value || 0}
           trend={kpis?.kpis?.incidents_prevented?.trend}
           icon={Target}
           color="emerald"
         />
         <KPICard 
-          title="Économies"
+          title={t('executiveDashboard.kpis.secondary.savings')}
           value={`${(kpis?.kpis?.cost_savings?.value || 0).toLocaleString()}€`}
           trend={kpis?.kpis?.cost_savings?.trend}
           icon={DollarSign}
@@ -145,24 +147,24 @@ const ExecutiveDashboard = () => {
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
             <PieChart size={20} className="text-purple-600" />
-            Répartition des Alertes
+            {t('executiveDashboard.charts.alertsBySeverity.title')}
           </h3>
           
           <div className="space-y-3">
             <AlertBar 
-              label="Critiques" 
+              label={t('executiveDashboard.charts.alertsBySeverity.critical')} 
               value={kpis?.alerts_by_severity?.critical || 0} 
               total={kpis?.kpis?.total_alerts?.value || 1}
               color="red"
             />
             <AlertBar 
-              label="Élevées" 
+              label={t('executiveDashboard.charts.alertsBySeverity.high')} 
               value={kpis?.alerts_by_severity?.high || 0} 
               total={kpis?.kpis?.total_alerts?.value || 1}
               color="orange"
             />
             <AlertBar 
-              label="Avertissements" 
+              label={t('executiveDashboard.charts.alertsBySeverity.warnings')} 
               value={kpis?.alerts_by_severity?.warning || 0} 
               total={kpis?.kpis?.total_alerts?.value || 1}
               color="yellow"
@@ -174,7 +176,7 @@ const ExecutiveDashboard = () => {
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
             <Camera size={20} className="text-purple-600" />
-            Caméras les Plus Actives
+            {t('executiveDashboard.sections.topCameras')}
           </h3>
           
           <div className="space-y-3">
@@ -186,7 +188,7 @@ const ExecutiveDashboard = () => {
                   </span>
                   <span className="text-gray-700">{cam.name}</span>
                 </div>
-                <span className="text-gray-500 font-medium">{cam.alerts} alertes</span>
+                <span className="text-gray-500 font-medium">{t('executiveDashboard.common.alertsCount', { count: cam.alerts })}</span>
               </div>
             ))}
           </div>
@@ -196,7 +198,7 @@ const ExecutiveDashboard = () => {
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
             <Bell size={20} className="text-purple-600" />
-            Incidents Récents
+            {t('executiveDashboard.sections.recentIncidents')}
           </h3>
           
           <div className="space-y-3">
@@ -225,23 +227,23 @@ const ExecutiveDashboard = () => {
       <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-6 text-white">
         <h3 className="font-semibold text-xl mb-4 flex items-center gap-2">
           <Zap size={24} />
-          Insights Intelligence Artificielle
+          {t('executiveDashboard.insights.title')}
         </h3>
         
         <div className="grid grid-cols-3 gap-4">
           <InsightCard 
-            title="Pic d'Activité Détecté"
-            description="Augmentation de 45% des alertes entre 14h et 16h. Recommandation: renforcer la surveillance."
+            title={t('executiveDashboard.insights.cards.activitySpike.title')}
+            description={t('executiveDashboard.insights.cards.activitySpike.description')}
             type="warning"
           />
           <InsightCard 
-            title="Amélioration EPI"
-            description="Le taux de conformité a augmenté de 15% ce mois grâce aux nouvelles mesures."
+            title={t('executiveDashboard.insights.cards.ppeImprovement.title')}
+            description={t('executiveDashboard.insights.cards.ppeImprovement.description')}
             type="success"
           />
           <InsightCard 
-            title="Zone à Risque"
-            description="La zone de stockage génère 35% des alertes. Analyse approfondie recommandée."
+            title={t('executiveDashboard.insights.cards.riskZone.title')}
+            description={t('executiveDashboard.insights.cards.riskZone.description')}
             type="alert"
           />
         </div>
@@ -250,26 +252,26 @@ const ExecutiveDashboard = () => {
       {/* Actions Rapides */}
       <div className="grid grid-cols-4 gap-4">
         <ActionCard 
-          title="Générer Rapport"
-          description="Créer un rapport PDF complet"
+          title={t('executiveDashboard.quickActions.generateReport.title')}
+          description={t('executiveDashboard.quickActions.generateReport.description')}
           icon={Download}
           onClick={() => window.open('/api/advanced/reports/daily/' + new Date().toISOString().split('T')[0])}
         />
         <ActionCard 
-          title="Voir Toutes les Alertes"
-          description="Accéder à l'historique complet"
+          title={t('executiveDashboard.quickActions.viewAllAlerts.title')}
+          description={t('executiveDashboard.quickActions.viewAllAlerts.description')}
           icon={AlertTriangle}
           onClick={() => window.location.href = '/alerts'}
         />
         <ActionCard 
-          title="Configurer Notifications"
-          description="Gérer les canaux d'alerte"
+          title={t('executiveDashboard.quickActions.configureNotifications.title')}
+          description={t('executiveDashboard.quickActions.configureNotifications.description')}
           icon={Bell}
           onClick={() => window.location.href = '/settings#notifications'}
         />
         <ActionCard 
-          title="Analytics Sectoriels"
-          description="Analyses par industrie"
+          title={t('executiveDashboard.quickActions.industryAnalytics.title')}
+          description={t('executiveDashboard.quickActions.industryAnalytics.description')}
           icon={BarChart2}
           onClick={() => window.location.href = '/analytics'}
         />

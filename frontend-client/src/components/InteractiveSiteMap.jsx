@@ -5,10 +5,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Camera, AlertTriangle, Users, Car, Flame, Shield, ZoomIn, ZoomOut,
-  Move, Layers, Eye, EyeOff, MapPin, Navigation, Maximize2, RefreshCw,
-  Circle, Square, Triangle, Hexagon, Plus, Minus, RotateCcw, Settings,
-  Play, Pause, ChevronLeft, ChevronRight
+  Camera, AlertTriangle, Users, Car, ZoomIn, ZoomOut, Layers, Eye, EyeOff, MapPin, Maximize2, Square, RotateCcw
 } from 'lucide-react';
 
 // Camera marker component

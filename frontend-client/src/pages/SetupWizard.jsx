@@ -4,12 +4,14 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // ============================================================================
 // Composant Principal
 // ============================================================================
 
 export default function SetupWizard({ onComplete }) {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -61,11 +63,11 @@ export default function SetupWizard({ onComplete }) {
 
   // Steps du wizard
   const steps = [
-    { id: 'welcome', title: 'Bienvenue', icon: '🎥' },
-    { id: 'admin', title: 'Administrateur', icon: '👤' },
-    { id: 'cameras', title: 'Caméras', icon: '📹' },
-    { id: 'detections', title: 'Détections', icon: '🤖' },
-    { id: 'complete', title: 'Terminé', icon: '✅' }
+    { id: 'welcome', title: t('setupWizard.steps.welcome'), icon: '🎥' },
+    { id: 'admin', title: t('setupWizard.steps.admin'), icon: '👤' },
+    { id: 'cameras', title: t('setupWizard.steps.cameras'), icon: '📹' },
+    { id: 'detections', title: t('setupWizard.steps.detections'), icon: '🤖' },
+    { id: 'complete', title: t('setupWizard.steps.complete'), icon: '✅' }
   ];
 
   if (loading) {
@@ -79,10 +81,10 @@ export default function SetupWizard({ onComplete }) {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">
-            🎥 OhmVision
+            🎥 {t('common.brand')}
           </h1>
           <p className="text-blue-200">
-            Configurez votre système de vidéosurveillance intelligente
+            {t('setupWizard.header.subtitle')}
           </p>
         </div>
 
@@ -157,12 +159,12 @@ export default function SetupWizard({ onComplete }) {
     setError(null);
     
     if (adminData.password !== adminData.confirmPassword) {
-      setError('Les mots de passe ne correspondent pas');
+      setError(t('setupWizard.errors.passwordMismatch'));
       return;
     }
     
     if (adminData.password.length < 6) {
-      setError('Le mot de passe doit contenir au moins 6 caractères');
+      setError(t('setupWizard.errors.passwordTooShort', { min: 6 }));
       return;
     }
     
@@ -180,7 +182,7 @@ export default function SetupWizard({ onComplete }) {
       
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.detail || 'Erreur lors de la création du compte');
+        throw new Error(data.detail || t('setupWizard.errors.createAccountFailed'));
       }
       
       setCurrentStep(2);
@@ -191,13 +193,13 @@ export default function SetupWizard({ onComplete }) {
 
   async function handleCamerasSubmit() {
     if (selectedCameras.length === 0) {
-      setError('Veuillez ajouter au moins une caméra');
+      setError(t('setupWizard.errors.addAtLeastOneCamera'));
       return;
     }
     
     try {
       const camerasToAdd = selectedCameras.map(cam => ({
-        name: cam.name || `Camera ${cam.ip}`,
+        name: cam.name || t('setupWizard.cameras.defaultName', { ip: cam.ip }),
         ip: cam.ip,
         rtsp_url: cam.rtsp_url || cam.rtspUrl,
         username: cam.username || '',
@@ -214,7 +216,7 @@ export default function SetupWizard({ onComplete }) {
       });
       
       if (!response.ok) {
-        throw new Error('Erreur lors de l\'ajout des caméras');
+        throw new Error(t('setupWizard.errors.addCamerasFailed'));
       }
       
       setCurrentStep(3);
@@ -256,11 +258,12 @@ export default function SetupWizard({ onComplete }) {
 // ============================================================================
 
 function LoadingScreen() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent mx-auto mb-4"></div>
-        <p className="text-white text-xl">Chargement...</p>
+        <p className="text-white text-xl">{t('setupWizard.loading')}</p>
       </div>
     </div>
   );
@@ -295,33 +298,33 @@ function StepIndicator({ steps, currentStep }) {
 }
 
 function WelcomeStep({ onNext }) {
+  const { t } = useTranslation();
   return (
     <div className="text-center py-8">
       <div className="text-6xl mb-6">🎥</div>
       <h2 className="text-3xl font-bold text-gray-800 mb-4">
-        Bienvenue dans OhmVision
+        {t('setupWizard.welcome.title')}
       </h2>
       <p className="text-gray-600 mb-8 max-w-md mx-auto">
-        Configurons votre système de vidéosurveillance intelligente 
-        en quelques étapes simples.
+        {t('setupWizard.welcome.subtitle')}
       </p>
       
       <div className="grid grid-cols-2 gap-4 max-w-md mx-auto mb-8 text-left">
         <div className="flex items-center p-3 bg-blue-50 rounded-lg">
           <span className="text-2xl mr-3">👤</span>
-          <span className="text-sm text-gray-700">Créer un compte admin</span>
+          <span className="text-sm text-gray-700">{t('setupWizard.welcome.cards.admin')}</span>
         </div>
         <div className="flex items-center p-3 bg-green-50 rounded-lg">
           <span className="text-2xl mr-3">📹</span>
-          <span className="text-sm text-gray-700">Scanner vos caméras</span>
+          <span className="text-sm text-gray-700">{t('setupWizard.welcome.cards.scan')}</span>
         </div>
         <div className="flex items-center p-3 bg-purple-50 rounded-lg">
           <span className="text-2xl mr-3">🤖</span>
-          <span className="text-sm text-gray-700">Configurer l'IA</span>
+          <span className="text-sm text-gray-700">{t('setupWizard.welcome.cards.ai')}</span>
         </div>
         <div className="flex items-center p-3 bg-orange-50 rounded-lg">
           <span className="text-2xl mr-3">✅</span>
-          <span className="text-sm text-gray-700">C'est prêt !</span>
+          <span className="text-sm text-gray-700">{t('setupWizard.welcome.cards.ready')}</span>
         </div>
       </div>
       
@@ -329,13 +332,14 @@ function WelcomeStep({ onNext }) {
         onClick={onNext}
         className="px-8 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors"
       >
-        Commencer →
+        {t('setupWizard.actions.start')}
       </button>
     </div>
   );
 }
 
-function AdminStep({ data, onChange, onNext, onBack, error, setError }) {
+function AdminStep({ data, onChange, onNext, onBack, error: _error, setError }) {
+  const { t } = useTranslation();
   const handleChange = (field, value) => {
     onChange({ ...data, [field]: value });
     setError(null);
@@ -344,79 +348,79 @@ function AdminStep({ data, onChange, onNext, onBack, error, setError }) {
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-800 mb-2">
-        👤 Créer le compte administrateur
+        👤 {t('setupWizard.admin.title')}
       </h2>
       <p className="text-gray-600 mb-6">
-        Ce compte vous permettra de gérer OhmVision.
+        {t('setupWizard.admin.subtitle')}
       </p>
       
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nom complet
+            {t('setupWizard.admin.fields.fullName')}
           </label>
           <input
             type="text"
             value={data.fullName}
             onChange={(e) => handleChange('fullName', e.target.value)}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            placeholder="Jean Dupont"
+            placeholder={t('setupWizard.admin.placeholders.fullName')}
             required
           />
         </div>
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email
+            {t('setupWizard.admin.fields.email')}
           </label>
           <input
             type="email"
             value={data.email}
             onChange={(e) => handleChange('email', e.target.value)}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            placeholder="admin@example.com"
+            placeholder={t('setupWizard.admin.placeholders.email')}
             required
           />
         </div>
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Mot de passe
+            {t('setupWizard.admin.fields.password')}
           </label>
           <input
             type="password"
             value={data.password}
             onChange={(e) => handleChange('password', e.target.value)}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            placeholder="••••••••"
+            placeholder={t('setupWizard.admin.placeholders.password')}
             required
           />
         </div>
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Confirmer le mot de passe
+            {t('setupWizard.admin.fields.confirmPassword')}
           </label>
           <input
             type="password"
             value={data.confirmPassword}
             onChange={(e) => handleChange('confirmPassword', e.target.value)}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            placeholder="••••••••"
+            placeholder={t('setupWizard.admin.placeholders.password')}
             required
           />
         </div>
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nom de l'entreprise (optionnel)
+            {t('setupWizard.admin.fields.companyNameOptional')}
           </label>
           <input
             type="text"
             value={data.companyName}
             onChange={(e) => handleChange('companyName', e.target.value)}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            placeholder="Ma Société"
+            placeholder={t('setupWizard.admin.placeholders.companyName')}
           />
         </div>
       </div>
@@ -426,13 +430,13 @@ function AdminStep({ data, onChange, onNext, onBack, error, setError }) {
           onClick={onBack}
           className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
         >
-          ← Retour
+          {t('setupWizard.actions.back')}
         </button>
         <button
           onClick={onNext}
           className="px-6 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700"
         >
-          Continuer →
+          {t('setupWizard.actions.next')}
         </button>
       </div>
     </div>
@@ -447,6 +451,7 @@ function CamerasStep({
   manualCamera, setManualCamera,
   onNext, onBack, setError
 }) {
+  const { t } = useTranslation();
   const [showManualForm, setShowManualForm] = useState(false);
   const [testingCamera, setTestingCamera] = useState(null);
 
@@ -485,7 +490,7 @@ function CamerasStep({
       pollStatus();
     } catch (err) {
       setScanStatus('error');
-      setError('Erreur lors du scan réseau');
+      setError(t('setupWizard.errors.networkScanFailed'));
     }
   };
 
@@ -533,7 +538,7 @@ function CamerasStep({
 
   const addManualCamera = async () => {
     if (!manualCamera.ip) {
-      setError('Veuillez entrer une adresse IP');
+      setError(t('setupWizard.errors.enterIpAddress'));
       return;
     }
     
@@ -563,7 +568,7 @@ function CamerasStep({
       
       const newCamera = {
         ip: manualCamera.ip,
-        name: manualCamera.name || `Camera ${manualCamera.ip}`,
+        name: manualCamera.name || t('setupWizard.cameras.defaultName', { ip: manualCamera.ip }),
         rtsp_url: rtspUrl,
         username: manualCamera.username,
         password: manualCamera.password,
@@ -576,7 +581,7 @@ function CamerasStep({
       setManualCamera({ name: '', ip: '', rtspUrl: '', username: 'admin', password: '' });
       
     } catch (err) {
-      setError('Erreur lors du test de la caméra');
+      setError(t('setupWizard.errors.cameraTestFailed'));
     }
     
     setTestingCamera(null);
@@ -585,10 +590,10 @@ function CamerasStep({
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-800 mb-2">
-        📹 Rechercher vos caméras
+        📹 {t('setupWizard.cameras.title')}
       </h2>
       <p className="text-gray-600 mb-6">
-        OhmVision peut scanner votre réseau pour trouver automatiquement vos caméras.
+        {t('setupWizard.cameras.subtitle')}
       </p>
       
       {/* Scan Button */}
@@ -601,11 +606,11 @@ function CamerasStep({
           {scanStatus === 'scanning' ? (
             <>
               <span className="animate-spin">🔄</span>
-              Scan en cours... {scanProgress}%
+              {t('setupWizard.cameras.scan.scanning', { progress: scanProgress })}
             </>
           ) : (
             <>
-              🔍 Scanner le réseau
+              🔍 {t('setupWizard.cameras.scan.start')}
             </>
           )}
         </button>
@@ -614,7 +619,7 @@ function CamerasStep({
           onClick={() => setShowManualForm(!showManualForm)}
           className="px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
         >
-          ➕ Ajouter manuellement
+          ➕ {t('setupWizard.cameras.manual.toggle')}
         </button>
       </div>
       
@@ -633,39 +638,39 @@ function CamerasStep({
       {/* Manual Form */}
       {showManualForm && (
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold mb-3">Ajouter une caméra manuellement</h3>
+          <h3 className="font-semibold mb-3">{t('setupWizard.cameras.manual.title')}</h3>
           <div className="grid grid-cols-2 gap-4">
             <input
               type="text"
-              placeholder="Nom (ex: Entrée)"
+              placeholder={t('setupWizard.cameras.manual.placeholders.name')}
               value={manualCamera.name}
               onChange={(e) => setManualCamera({...manualCamera, name: e.target.value})}
               className="px-3 py-2 border rounded-lg"
             />
             <input
               type="text"
-              placeholder="Adresse IP"
+              placeholder={t('setupWizard.cameras.manual.placeholders.ip')}
               value={manualCamera.ip}
               onChange={(e) => setManualCamera({...manualCamera, ip: e.target.value})}
               className="px-3 py-2 border rounded-lg"
             />
             <input
               type="text"
-              placeholder="Utilisateur (admin)"
+              placeholder={t('setupWizard.cameras.manual.placeholders.username')}
               value={manualCamera.username}
               onChange={(e) => setManualCamera({...manualCamera, username: e.target.value})}
               className="px-3 py-2 border rounded-lg"
             />
             <input
               type="password"
-              placeholder="Mot de passe"
+              placeholder={t('setupWizard.cameras.manual.placeholders.password')}
               value={manualCamera.password}
               onChange={(e) => setManualCamera({...manualCamera, password: e.target.value})}
               className="px-3 py-2 border rounded-lg"
             />
             <input
               type="text"
-              placeholder="URL RTSP (optionnel, auto-détectée)"
+              placeholder={t('setupWizard.cameras.manual.placeholders.rtspUrl')}
               value={manualCamera.rtspUrl}
               onChange={(e) => setManualCamera({...manualCamera, rtspUrl: e.target.value})}
               className="col-span-2 px-3 py-2 border rounded-lg"
@@ -676,7 +681,7 @@ function CamerasStep({
             disabled={testingCamera === 'manual'}
             className="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
           >
-            {testingCamera === 'manual' ? 'Test en cours...' : 'Ajouter'}
+            {testingCamera === 'manual' ? t('setupWizard.cameras.manual.testing') : t('common.add')}
           </button>
         </div>
       )}
@@ -685,7 +690,7 @@ function CamerasStep({
       {discoveredDevices.length > 0 && (
         <div className="mb-6">
           <h3 className="font-semibold mb-3">
-            Appareils détectés ({discoveredDevices.length})
+            {t('setupWizard.cameras.detectedDevicesTitle', { count: discoveredDevices.length })}
           </h3>
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {discoveredDevices.map((device) => (
@@ -716,8 +721,8 @@ function CamerasStep({
                       )}
                     </div>
                     <div className="text-sm text-gray-500">
-                      {device.is_onvif && <span className="mr-2">📷 ONVIF</span>}
-                      {device.rtsp_valid && <span className="text-green-600">✓ RTSP OK</span>}
+                      {device.is_onvif && <span className="mr-2">📷 {t('setupWizard.cameras.labels.onvif')}</span>}
+                      {device.rtsp_valid && <span className="text-green-600">✓ {t('setupWizard.cameras.labels.rtspOk')}</span>}
                       {device.resolution && <span className="ml-2">{device.resolution}</span>}
                     </div>
                   </div>
@@ -727,7 +732,7 @@ function CamerasStep({
                   disabled={testingCamera === device.ip}
                   className="px-3 py-1 text-sm bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-50"
                 >
-                  {testingCamera === device.ip ? '...' : 'Tester'}
+                  {testingCamera === device.ip ? '...' : t('setupWizard.cameras.actions.test')}
                 </button>
               </div>
             ))}
@@ -739,7 +744,7 @@ function CamerasStep({
       {selectedCameras.length > 0 && (
         <div className="bg-green-50 rounded-lg p-4 mb-6">
           <h3 className="font-semibold text-green-800 mb-2">
-            ✓ {selectedCameras.length} caméra(s) sélectionnée(s)
+            ✓ {t('setupWizard.cameras.selectedCount', { count: selectedCameras.length })}
           </h3>
           <div className="text-sm text-green-700">
             {selectedCameras.map(c => c.ip).join(', ')}
@@ -753,14 +758,14 @@ function CamerasStep({
           onClick={onBack}
           className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
         >
-          ← Retour
+          {t('setupWizard.actions.back')}
         </button>
         <button
           onClick={onNext}
           disabled={selectedCameras.length === 0}
           className="px-6 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Continuer →
+          {t('setupWizard.actions.next')}
         </button>
       </div>
     </div>
@@ -768,12 +773,13 @@ function CamerasStep({
 }
 
 function DetectionsStep({ cameras, setCameras, onNext, onBack }) {
+  const { t } = useTranslation();
   const detectionTypes = [
-    { id: 'person', label: 'Détection de personnes', icon: '👤', description: 'Détecte les personnes dans le champ de vision' },
-    { id: 'fall', label: 'Détection de chute', icon: '⚠️', description: 'Alerte en cas de chute d\'une personne' },
-    { id: 'fire', label: 'Détection feu/fumée', icon: '🔥', description: 'Détecte les départs de feu et la fumée' },
-    { id: 'ppe', label: 'Détection EPI', icon: '🦺', description: 'Vérifie le port du casque et du gilet' },
-    { id: 'counting', label: 'Comptage', icon: '📊', description: 'Compte les entrées et sorties' }
+    { id: 'person', label: t('setupWizard.detections.types.person.label'), icon: '👤', description: t('setupWizard.detections.types.person.description') },
+    { id: 'fall', label: t('setupWizard.detections.types.fall.label'), icon: '⚠️', description: t('setupWizard.detections.types.fall.description') },
+    { id: 'fire', label: t('setupWizard.detections.types.fire.label'), icon: '🔥', description: t('setupWizard.detections.types.fire.description') },
+    { id: 'ppe', label: t('setupWizard.detections.types.ppe.label'), icon: '🦺', description: t('setupWizard.detections.types.ppe.description') },
+    { id: 'counting', label: t('setupWizard.detections.types.counting.label'), icon: '📊', description: t('setupWizard.detections.types.counting.description') }
   ];
 
   const toggleDetection = (cameraIndex, detectionId) => {
@@ -808,15 +814,15 @@ function DetectionsStep({ cameras, setCameras, onNext, onBack }) {
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-800 mb-2">
-        🤖 Configurer les détections IA
+        🤖 {t('setupWizard.detections.title')}
       </h2>
       <p className="text-gray-600 mb-6">
-        Choisissez les analyses à activer pour chaque caméra.
+        {t('setupWizard.detections.subtitle')}
       </p>
       
       {/* Quick Enable All */}
       <div className="bg-gray-50 rounded-lg p-4 mb-6">
-        <h3 className="font-semibold mb-3">Activer pour toutes les caméras :</h3>
+        <h3 className="font-semibold mb-3">{t('setupWizard.detections.enableAllTitle')}</h3>
         <div className="flex flex-wrap gap-2">
           {detectionTypes.map(det => (
             <button
@@ -871,13 +877,13 @@ function DetectionsStep({ cameras, setCameras, onNext, onBack }) {
           onClick={onBack}
           className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
         >
-          ← Retour
+          {t('setupWizard.actions.back')}
         </button>
         <button
           onClick={onNext}
           className="px-6 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700"
         >
-          Continuer →
+          {t('setupWizard.actions.next')}
         </button>
       </div>
     </div>
@@ -885,6 +891,7 @@ function DetectionsStep({ cameras, setCameras, onNext, onBack }) {
 }
 
 function CompleteStep({ onFinish }) {
+  const { t } = useTranslation();
   const [finishing, setFinishing] = useState(false);
 
   const handleFinish = async () => {
@@ -896,20 +903,19 @@ function CompleteStep({ onFinish }) {
     <div className="text-center py-8">
       <div className="text-6xl mb-6">🎉</div>
       <h2 className="text-3xl font-bold text-gray-800 mb-4">
-        Configuration terminée !
+        {t('setupWizard.complete.title')}
       </h2>
       <p className="text-gray-600 mb-8 max-w-md mx-auto">
-        Votre système OhmVision est prêt. Vos caméras sont configurées 
-        et l'analyse IA est activée.
+        {t('setupWizard.complete.subtitle')}
       </p>
       
       <div className="bg-green-50 rounded-lg p-6 max-w-md mx-auto mb-8">
-        <h3 className="font-semibold text-green-800 mb-4">Ce qui vous attend :</h3>
+        <h3 className="font-semibold text-green-800 mb-4">{t('setupWizard.complete.whatsNextTitle')}</h3>
         <ul className="text-left text-green-700 space-y-2">
-          <li>✓ Dashboard en temps réel</li>
-          <li>✓ Alertes instantanées</li>
-          <li>✓ Analyses IA 24/7</li>
-          <li>✓ Historique des événements</li>
+          <li>✓ {t('setupWizard.complete.whatsNext.items.realtimeDashboard')}</li>
+          <li>✓ {t('setupWizard.complete.whatsNext.items.instantAlerts')}</li>
+          <li>✓ {t('setupWizard.complete.whatsNext.items.ai247')}</li>
+          <li>✓ {t('setupWizard.complete.whatsNext.items.eventHistory')}</li>
         </ul>
       </div>
       
@@ -918,7 +924,7 @@ function CompleteStep({ onFinish }) {
         disabled={finishing}
         className="px-8 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50"
       >
-        {finishing ? 'Finalisation...' : 'Ouvrir le Dashboard →'}
+        {finishing ? t('setupWizard.complete.finishing') : t('setupWizard.complete.openDashboard')}
       </button>
     </div>
   );

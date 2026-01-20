@@ -6,16 +6,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
-  ArrowLeft, Settings, Maximize, Volume2, VolumeX,
-  Camera, AlertTriangle, Users, Shield, Flame,
-  Play, Pause, RefreshCw, Download, Share2,
-  ChevronDown, Check, X, Zap, Eye
+  ArrowLeft, Settings, Maximize, AlertTriangle, Users,
+  Play, Pause, RefreshCw, Download, Zap, Eye
 } from 'lucide-react';
 import { useCamerasStore, useAlertsStore, useUIStore } from '../services/store';
 import LiveStream from '../components/LiveStream';
 
 const CameraView = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const videoContainerRef = useRef(null);
@@ -24,7 +24,7 @@ const CameraView = () => {
   const { alerts, fetchAlerts } = useAlertsStore();
   const { addNotification } = useUIStore();
   
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [_isFullscreen, setIsFullscreen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [detectionConfig, setDetectionConfig] = useState({});
@@ -34,6 +34,14 @@ const CameraView = () => {
     exits: 0,
     alerts: 0
   });
+
+  const detectionLabels = {
+    person_detection: t('cameraView.detections.person.label'),
+    counting: t('cameraView.detections.counting.label'),
+    fall_detection: t('cameraView.detections.fall.label'),
+    ppe_detection: t('cameraView.detections.ppe.label'),
+    fire_detection: t('cameraView.detections.fire.label')
+  };
   
   useEffect(() => {
     getCamera(id);
@@ -65,10 +73,14 @@ const CameraView = () => {
     
     const result = await updateDetectionConfig(id, { [key]: value });
     if (result.success) {
+      const featureLabel = detectionLabels[key] || key;
       addNotification({
         type: 'success',
-        title: 'Configuration mise à jour',
-        message: `${key} ${value ? 'activé' : 'désactivé'}`
+        title: t('cameraView.notifications.configUpdated.title'),
+        message: t('cameraView.notifications.configUpdated.message', {
+          feature: featureLabel,
+          state: value ? t('cameraView.common.enabled') : t('cameraView.common.disabled')
+        })
       });
     }
   };
@@ -115,7 +127,7 @@ const CameraView = () => {
             selectedCamera.is_online ? 'bg-success/20 text-success' : 'bg-danger/20 text-danger'
           }`}>
             <span className={`w-2 h-2 rounded-full ${selectedCamera.is_online ? 'bg-success animate-pulse' : 'bg-danger'}`} />
-            {selectedCamera.is_online ? 'En ligne' : 'Hors ligne'}
+            {selectedCamera.is_online ? t('cameraView.status.online') : t('cameraView.status.offline')}
           </span>
           
           <button
@@ -147,7 +159,7 @@ const CameraView = () => {
             <div className="absolute top-4 right-4 bg-black/50 rounded-lg p-3 space-y-2 z-10">
               <div className="flex items-center gap-2 text-sm">
                 <Users size={14} className="text-primary" />
-                <span className="text-white">{stats.persons} personnes</span>
+                <span className="text-white">{t('cameraView.overlay.peopleCount', { count: stats.persons })}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-success">
                 <span>↓ {stats.entries}</span>
@@ -161,17 +173,17 @@ const CameraView = () => {
               <div className="absolute bottom-16 left-4 flex flex-wrap gap-2 z-10">
                 {detectionConfig.fall_detection && (
                   <span className="bg-purple-600/80 text-white text-xs px-2 py-1 rounded">
-                    Chute
+                    {t('cameraView.badges.fall')}
                   </span>
                 )}
                 {detectionConfig.ppe_detection && (
                   <span className="bg-warning/80 text-white text-xs px-2 py-1 rounded">
-                    EPI
+                    {t('cameraView.badges.ppe')}
                   </span>
                 )}
                 {detectionConfig.fire_detection && (
                   <span className="bg-danger/80 text-white text-xs px-2 py-1 rounded">
-                    Feu
+                    {t('cameraView.badges.fire')}
                   </span>
                 )}
               </div>
@@ -218,27 +230,27 @@ const CameraView = () => {
           <div className="grid grid-cols-4 gap-3">
             <StatCard
               icon={Users}
-              label="Personnes"
+              label={t('cameraView.quickStats.people')}
               value={stats.persons}
               color="primary"
             />
             <StatCard
               icon={ArrowLeft}
-              label="Entrées"
+              label={t('cameraView.quickStats.entries')}
               value={stats.entries}
               color="success"
               rotate={-90}
             />
             <StatCard
               icon={ArrowLeft}
-              label="Sorties"
+              label={t('cameraView.quickStats.exits')}
               value={stats.exits}
               color="warning"
               rotate={90}
             />
             <StatCard
               icon={AlertTriangle}
-              label="Alertes"
+              label={t('cameraView.quickStats.alerts')}
               value={cameraAlerts.length}
               color="danger"
             />
@@ -256,37 +268,37 @@ const CameraView = () => {
             >
               <h3 className="font-semibold mb-4 flex items-center gap-2">
                 <Zap size={18} className="text-primary" />
-                Détections IA
+                {t('cameraView.detections.title')}
               </h3>
               
               <div className="space-y-3">
                 <ToggleOption
-                  label="Détection personnes"
-                  description="Détecte les personnes dans le champ"
+                  label={t('cameraView.detections.person.label')}
+                  description={t('cameraView.detections.person.description')}
                   enabled={detectionConfig.person_detection}
                   onChange={(v) => handleConfigChange('person_detection', v)}
                 />
                 <ToggleOption
-                  label="Comptage"
-                  description="Compte les entrées et sorties"
+                  label={t('cameraView.detections.counting.label')}
+                  description={t('cameraView.detections.counting.description')}
                   enabled={detectionConfig.counting}
                   onChange={(v) => handleConfigChange('counting', v)}
                 />
                 <ToggleOption
-                  label="Détection chute"
-                  description="Alerte en cas de chute"
+                  label={t('cameraView.detections.fall.label')}
+                  description={t('cameraView.detections.fall.description')}
                   enabled={detectionConfig.fall_detection}
                   onChange={(v) => handleConfigChange('fall_detection', v)}
                 />
                 <ToggleOption
-                  label="Détection EPI"
-                  description="Vérifie casque et gilet"
+                  label={t('cameraView.detections.ppe.label')}
+                  description={t('cameraView.detections.ppe.description')}
                   enabled={detectionConfig.ppe_detection}
                   onChange={(v) => handleConfigChange('ppe_detection', v)}
                 />
                 <ToggleOption
-                  label="Détection feu"
-                  description="Détecte feu et fumée"
+                  label={t('cameraView.detections.fire.label')}
+                  description={t('cameraView.detections.fire.description')}
                   enabled={detectionConfig.fire_detection}
                   onChange={(v) => handleConfigChange('fire_detection', v)}
                 />
@@ -298,12 +310,12 @@ const CameraView = () => {
           <div className="bg-dark-800 rounded-2xl p-4">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
               <AlertTriangle size={18} className="text-warning" />
-              Alertes récentes
+              {t('cameraView.recentAlerts.title')}
             </h3>
             
             {cameraAlerts.length === 0 ? (
               <p className="text-gray-500 text-sm text-center py-4">
-                Aucune alerte récente
+                {t('cameraView.recentAlerts.empty')}
               </p>
             ) : (
               <div className="space-y-2 max-h-64 overflow-y-auto">
@@ -330,14 +342,14 @@ const CameraView = () => {
           <div className="bg-dark-800 rounded-2xl p-4">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
               <Eye size={18} className="text-primary" />
-              Informations
+              {t('cameraView.info.title')}
             </h3>
             
             <div className="space-y-3 text-sm">
-              <InfoRow label="IP" value={selectedCamera.ip_address || 'N/A'} />
-              <InfoRow label="Résolution" value={`${selectedCamera.resolution_width || 1920}x${selectedCamera.resolution_height || 1080}`} />
-              <InfoRow label="FPS" value={selectedCamera.fps || 15} />
-              <InfoRow label="Dernière activité" value={selectedCamera.last_seen ? new Date(selectedCamera.last_seen).toLocaleString() : 'N/A'} />
+              <InfoRow label={t('cameraView.info.ip')} value={selectedCamera.ip_address || t('common.na')} />
+              <InfoRow label={t('cameraView.info.resolution')} value={`${selectedCamera.resolution_width || 1920}x${selectedCamera.resolution_height || 1080}`} />
+              <InfoRow label={t('cameraView.info.fps')} value={selectedCamera.fps || 15} />
+              <InfoRow label={t('cameraView.info.lastActivity')} value={selectedCamera.last_seen ? new Date(selectedCamera.last_seen).toLocaleString() : t('common.na')} />
             </div>
           </div>
         </div>
