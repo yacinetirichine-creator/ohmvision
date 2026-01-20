@@ -79,6 +79,19 @@ Guide complet pour déployer OhmVision sur un VPS Hetzner Cloud avec Docker, Ngi
 
 ## ⚡ Déploiement Automatique
 
+### Option 0: Backend Hetzner + Frontend Vercel (recommandé)
+
+Si ton frontend est sur Vercel et que Hetzner héberge uniquement l'API, utilise le script:
+
+```bash
+chmod +x deploy-hetzner-api.sh
+./deploy-hetzner-api.sh
+```
+
+Cela déploie: `backend + postgres + redis + nginx + certbot` et expose l'API sur `https://api.<domaine>`.
+
+Côté Vercel, définir `VITE_API_BASE=https://api.<domaine>/api`.
+
 ### Option 1: Script automatisé (RECOMMANDÉ)
 
 ```bash
