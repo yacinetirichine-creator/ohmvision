@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from 'react';
+import React, { useMemo, useState, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FiArrowRight, FiActivity, FiShield, FiCpu, FiCheck, FiPlay, FiMail } from 'react-icons/fi';
@@ -7,10 +7,21 @@ import { Hero3D } from '../components/Hero3D';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
-const LandingPage = () => {
+const LandingPage = ({ mode = 'app' }) => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const { t } = useTranslation();
+
+  const links = useMemo(() => {
+    const appUrl = 'https://ohmvision.app';
+    const siteUrl = 'https://ohmvision.fr';
+
+    const loginHref = mode === 'site' ? `${appUrl}/login` : '/login';
+    const startHref = mode === 'site' ? `${appUrl}/login` : '/login';
+    const officialSiteHref = mode === 'site' ? siteUrl : siteUrl;
+
+    return { appUrl, siteUrl, loginHref, startHref, officialSiteHref };
+  }, [mode]);
 
   const handleSubscribe = (e) => {
     e.preventDefault();
@@ -43,18 +54,31 @@ const LandingPage = () => {
             <a href="#features" className="hover:text-ohm-cyan transition-colors">{t('landing.nav.features')}</a>
             <a href="#security" className="hover:text-ohm-cyan transition-colors">{t('landing.nav.security')}</a>
             <a href="#pricing" className="hover:text-ohm-cyan transition-colors">{t('landing.nav.pricing')}</a>
-            <a href="https://www.ohmtronic.fr" target="_blank" rel="noopener noreferrer" className="text-ohm-cyan hover:text-white transition-colors">{t('landing.nav.officialSite')}</a>
+            <a href={links.officialSiteHref} target="_blank" rel="noopener noreferrer" className="text-ohm-cyan hover:text-white transition-colors">{t('landing.nav.officialSite')}</a>
           </div>
           <div className="flex gap-4">
             <div className="hidden sm:flex items-center">
               <LanguageSwitcher />
             </div>
-            <Link to="/login" className="px-4 py-2 text-sm font-medium hover:text-white text-gray-400 transition-colors">
-              {t('landing.nav.login')}
-            </Link>
-            <Link to="/login" className="px-5 py-2 bg-white/10 hover:bg-ohm-cyan hover:text-dark-900 border border-white/20 rounded-full text-sm font-bold transition-all duration-300 backdrop-blur-sm">
-              {t('landing.nav.start')}
-            </Link>
+            {mode === 'site' ? (
+              <a href={links.loginHref} className="px-4 py-2 text-sm font-medium hover:text-white text-gray-400 transition-colors">
+                {t('landing.nav.login')}
+              </a>
+            ) : (
+              <Link to={links.loginHref} className="px-4 py-2 text-sm font-medium hover:text-white text-gray-400 transition-colors">
+                {t('landing.nav.login')}
+              </Link>
+            )}
+
+            {mode === 'site' ? (
+              <a href={links.startHref} className="px-5 py-2 bg-white/10 hover:bg-ohm-cyan hover:text-dark-900 border border-white/20 rounded-full text-sm font-bold transition-all duration-300 backdrop-blur-sm">
+                {t('landing.nav.start')}
+              </a>
+            ) : (
+              <Link to={links.startHref} className="px-5 py-2 bg-white/10 hover:bg-ohm-cyan hover:text-dark-900 border border-white/20 rounded-full text-sm font-bold transition-all duration-300 backdrop-blur-sm">
+                {t('landing.nav.start')}
+              </Link>
+            )}
           </div>
         </div>
       </nav>
@@ -81,10 +105,17 @@ const LandingPage = () => {
               {t('landing.hero.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/login" className="btn-primary flex items-center justify-center gap-2 group">
-                {t('landing.hero.ctaDemo')}
-                <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
-              </Link>
+              {mode === 'site' ? (
+                <a href={links.loginHref} className="btn-primary flex items-center justify-center gap-2 group">
+                  {t('landing.hero.ctaDemo')}
+                  <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
+                </a>
+              ) : (
+                <Link to={links.loginHref} className="btn-primary flex items-center justify-center gap-2 group">
+                  {t('landing.hero.ctaDemo')}
+                  <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+              )}
               <button 
                 onClick={() => document.getElementById('demo-video').scrollIntoView({ behavior: 'smooth' })}
                 className="px-6 py-3 rounded-lg border border-white/20 hover:bg-white/5 transition-all flex items-center justify-center gap-2 font-medium"
@@ -231,7 +262,7 @@ const LandingPage = () => {
             <p className="text-gray-500 text-sm">{t('landing.footer.copyright')}</p>
            </div>
            <div className="flex gap-6">
-            <a href="https://www.ohmtronic.fr" className="text-gray-500 hover:text-ohm-cyan transition-colors">{t('landing.footer.officialSite')}</a>
+            <a href={links.officialSiteHref} className="text-gray-500 hover:text-ohm-cyan transition-colors">{t('landing.footer.officialSite')}</a>
             <Link to="/legal/privacy" className="text-gray-500 hover:text-ohm-cyan transition-colors">{t('landing.footer.privacy')}</Link>
             <Link to="/legal/gdpr" className="text-gray-500 hover:text-ohm-cyan transition-colors">{t('landing.footer.gdpr')}</Link>
             <Link to="/legal/mentions" className="text-gray-500 hover:text-ohm-cyan transition-colors">{t('landing.footer.mentions')}</Link>

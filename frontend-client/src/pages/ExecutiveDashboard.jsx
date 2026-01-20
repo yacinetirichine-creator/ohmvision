@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { apiUrl } from '../services/apiBase';
 import {
   TrendingUp, TrendingDown, AlertTriangle, Users, Shield, 
   Camera, Clock, DollarSign, Activity, Download,
@@ -23,8 +24,8 @@ const ExecutiveDashboard = () => {
     setLoading(true);
     try {
       const [kpisRes, trendsRes] = await Promise.all([
-        fetch(`/api/advanced/executive/kpis?period=${period}`),
-        fetch('/api/advanced/executive/trends?days=30')
+        fetch(apiUrl(`/advanced/executive/kpis?period=${period}`)),
+        fetch(apiUrl('/advanced/executive/trends?days=30'))
       ]);
       
       setKpis(await kpisRes.json());
@@ -255,7 +256,7 @@ const ExecutiveDashboard = () => {
           title={t('executiveDashboard.quickActions.generateReport.title')}
           description={t('executiveDashboard.quickActions.generateReport.description')}
           icon={Download}
-          onClick={() => window.open('/api/advanced/reports/daily/' + new Date().toISOString().split('T')[0])}
+          onClick={() => window.open(apiUrl('/advanced/reports/daily/' + new Date().toISOString().split('T')[0]))}
         />
         <ActionCard 
           title={t('executiveDashboard.quickActions.viewAllAlerts.title')}

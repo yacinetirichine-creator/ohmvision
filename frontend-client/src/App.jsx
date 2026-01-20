@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './services/store';
 import { useTranslation } from 'react-i18next';
+import { apiUrl } from './services/apiBase';
 
 // Layouts
 import AppLayout from './components/layout/AppLayout';
@@ -43,9 +44,19 @@ function App() {
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
 
+  const hostname = typeof window !== 'undefined' ? String(window.location.hostname || '').toLowerCase() : '';
+  const siteMode = hostname === 'ohmvision.fr' || hostname.endsWith('.ohmvision.fr') ? 'site' : 'app';
+
   const checkSetupStatus = useCallback(async () => {
     try {
-      const response = await fetch('/api/setup/status');
+      // Sur le domaine marketing (ohmvision.fr), on ne bloque pas sur le setup backend.
+      if (siteMode === 'site') {
+        setShowSetup(false);
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(apiUrl('/setup/status'));
       const data = await response.json();
       
       // Afficher le wizard si c'est la première exécution
@@ -57,7 +68,7 @@ function App() {
       setShowSetup(false);
       setLoading(false);
     }
-  }, []);
+  }, [siteMode]);
 
   useEffect(() => {
     checkSetupStatus();
@@ -89,7 +100,7 @@ function App() {
   return (
     <Routes>
       {/* Landing Page (Public) */}
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<LandingPage mode={siteMode} />} />
       <Route path="/legal/gdpr" element={<GDPRPage />} />
       <Route path="/legal/mentions" element={<LegalMentionsPage />} />
       <Route path="/legal/privacy" element={<PrivacyPage />} />

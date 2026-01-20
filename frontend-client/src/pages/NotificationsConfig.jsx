@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { apiUrl } from '../services/apiBase';
 import {
   Mail, MessageCircle, Send, Webhook, Bell, Smartphone,
   Plus, Trash2, TestTube, Check, X, ChevronDown, ChevronUp
@@ -61,7 +62,7 @@ const NotificationsConfig = () => {
 
   const fetchChannels = async () => {
     try {
-      const response = await fetch('/api/advanced/notifications/channels');
+      const response = await fetch(apiUrl('/advanced/notifications/channels'));
       const data = await response.json();
       setChannels(data.channels || []);
     } catch (err) {
@@ -72,7 +73,7 @@ const NotificationsConfig = () => {
   const addChannel = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/advanced/notifications/channels', {
+      const response = await fetch(apiUrl('/advanced/notifications/channels'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newChannel)
@@ -100,7 +101,7 @@ const NotificationsConfig = () => {
     if (!confirm(t('notificationsConfig.confirmDelete', { name }))) return;
     
     try {
-      await fetch(`/api/advanced/notifications/channels/${name}`, {
+      await fetch(apiUrl(`/advanced/notifications/channels/${name}`), {
         method: 'DELETE'
       });
       await fetchChannels();
@@ -113,7 +114,7 @@ const NotificationsConfig = () => {
     setTestResult({ channel: channelName, status: 'testing' });
     
     try {
-      const response = await fetch('/api/advanced/notifications/test', {
+      const response = await fetch(apiUrl('/advanced/notifications/test'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

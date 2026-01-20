@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { apiUrl } from '../services/apiBase';
 
 // ============================================================================
 // Composant Principal
@@ -40,7 +41,7 @@ export default function SetupWizard({ onComplete }) {
 
   const checkSetupStatus = useCallback(async () => {
     try {
-      const response = await fetch('/api/setup/status');
+      const response = await fetch(apiUrl('/setup/status'));
       const data = await response.json();
       
       if (data.setup_completed) {
@@ -169,7 +170,7 @@ export default function SetupWizard({ onComplete }) {
     }
     
     try {
-      const response = await fetch('/api/setup/admin', {
+      const response = await fetch(apiUrl('/setup/admin'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -209,7 +210,7 @@ export default function SetupWizard({ onComplete }) {
         enabled_detections: ['person']  // Par défaut
       }));
       
-      const response = await fetch('/api/setup/cameras', {
+      const response = await fetch(apiUrl('/setup/cameras'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(camerasToAdd)
@@ -231,7 +232,7 @@ export default function SetupWizard({ onComplete }) {
 
   async function handleFinish() {
     try {
-      const response = await fetch('/api/setup/complete', {
+      const response = await fetch(apiUrl('/setup/complete'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -462,11 +463,11 @@ function CamerasStep({
     
     try {
       // Démarrer le scan
-      await fetch('/api/discovery/scan/start', { method: 'POST' });
+      await fetch(apiUrl('/discovery/scan/start'), { method: 'POST' });
       
       // Polling du status
       const pollStatus = async () => {
-        const response = await fetch('/api/discovery/scan/status');
+        const response = await fetch(apiUrl('/discovery/scan/status'));
         const data = await response.json();
         
         setScanProgress(data.progress);
@@ -498,7 +499,7 @@ function CamerasStep({
     setTestingCamera(device.ip);
     
     try {
-      const response = await fetch('/api/discovery/rtsp/auto-discover', {
+      const response = await fetch(apiUrl('/discovery/rtsp/auto-discover'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -550,7 +551,7 @@ function CamerasStep({
       
       if (!rtspUrl) {
         // Auto-découverte
-        const response = await fetch('/api/discovery/rtsp/auto-discover', {
+        const response = await fetch(apiUrl('/discovery/rtsp/auto-discover'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

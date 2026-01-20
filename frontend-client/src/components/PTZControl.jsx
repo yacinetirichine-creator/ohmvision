@@ -9,6 +9,7 @@ import {
   ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Home,
   Focus, Aperture, Sun, Camera, Save, Grid, Crosshair, Target, Sliders
 } from 'lucide-react';
+import { apiUrl } from '../services/apiBase';
 
 // Digital zoom viewer with pan
 const DigitalZoomViewer = ({
@@ -365,7 +366,7 @@ const AdvancedControls = ({ onFocus, onIris, onBrightness, disabled = false }) =
 // Main PTZ Control Component
 const PTZControl = ({
   cameraId,
-  imageSrc = '/api/streaming/snapshot/1',
+  imageSrc = apiUrl('/streaming/snapshot/1'),
   hasPTZ = true,
   hasDigitalZoom = true,
   onPTZMove,

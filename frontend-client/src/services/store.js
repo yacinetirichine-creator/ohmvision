@@ -6,16 +6,13 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
 import i18n from '../i18n';
+import { API_BASE } from './apiBase';
 
 const getPreferredLanguage = () => {
   const lang = localStorage.getItem('ohmvision_language');
   if (lang === 'fr' || lang === 'en' || lang === 'es') return lang;
   return 'fr';
 };
-
-// API Configuration
-// Sur Vercel, définir VITE_API_BASE (ex: https://api.ohmvision.com/api)
-const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 const api = axios.create({
   baseURL: API_BASE,

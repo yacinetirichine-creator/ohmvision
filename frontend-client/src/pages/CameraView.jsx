@@ -7,6 +7,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { apiUrl } from '../services/apiBase';
 import {
   ArrowLeft, Settings, Maximize, AlertTriangle, Users,
   Play, Pause, RefreshCw, Download, Zap, Eye
@@ -209,7 +210,7 @@ const CameraView = () => {
                 
                 <div className="flex items-center gap-2">
                   <a 
-                    href={`/api/streaming/snapshot/${id}?quality=95`}
+                    href={apiUrl(`/streaming/snapshot/${id}?quality=95`)}
                     download={`snapshot-${selectedCamera.name}.jpg`}
                     className="p-2 hover:bg-white/20 rounded-lg text-white"
                   >

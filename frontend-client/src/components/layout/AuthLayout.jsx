@@ -10,7 +10,7 @@ export default function AuthLayout() {
   const { isAuthenticated } = useAuthStore();
   
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
   
   return (

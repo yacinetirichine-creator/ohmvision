@@ -12,19 +12,32 @@ const resources = {
   es: { translation: es }
 };
 
+const STORAGE_KEY = 'ohmvision_language';
+const hostname = typeof window !== 'undefined' ? String(window.location.hostname || '').toLowerCase() : '';
+const defaultLang = hostname.endsWith('ohmvision.app') || hostname === 'ohmvision.app' ? 'en' : 'fr';
+
+// Si l'utilisateur n'a pas encore choisi de langue, on force un défaut cohérent par domaine.
+try {
+  if (typeof window !== 'undefined' && !localStorage.getItem(STORAGE_KEY)) {
+    localStorage.setItem(STORAGE_KEY, defaultLang);
+  }
+} catch {
+  // ignore
+}
+
 if (!i18n.isInitialized) {
   i18n
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
       resources,
-      fallbackLng: 'fr',
+      fallbackLng: defaultLang,
       supportedLngs: ['fr', 'en', 'es'],
       interpolation: { escapeValue: false },
       detection: {
         order: ['localStorage', 'navigator'],
         caches: ['localStorage'],
-        lookupLocalStorage: 'ohmvision_language'
+        lookupLocalStorage: STORAGE_KEY
       }
     });
 }

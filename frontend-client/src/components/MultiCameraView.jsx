@@ -10,6 +10,7 @@ import {
   ChevronLeft, ChevronRight, Download,
   Fullscreen, PictureInPicture, RefreshCw, Eye, EyeOff
 } from 'lucide-react';
+import { apiUrl } from '../services/apiBase';
 
 // Layouts disponibles
 const LAYOUTS = {
@@ -73,7 +74,7 @@ const CameraFeed = ({
       {/* Video Feed */}
       <div className="aspect-video bg-dark-900 relative">
         <img 
-          src={`/api/streaming/mjpeg/${camera.id}`}
+          src={apiUrl(`/streaming/mjpeg/${camera.id}`)}
           alt={camera.name}
           className="w-full h-full object-cover"
           onError={(e) => {

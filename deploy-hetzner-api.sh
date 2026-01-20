@@ -31,24 +31,53 @@ EMAIL=""
 FRONTEND_URL=""
 CORS_ORIGINS=""
 CORS_ORIGIN_REGEX=""
+USE_SUPABASE="yes"
+DATABASE_URL=""
+SUPABASE_URL=""
+SUPABASE_ANON_KEY=""
 
 print_info "Configuration Hetzner (backend-only)"
 read -r -p "IP du serveur Hetzner: " SERVER_IP
-read -r -p "Domaine API (ex: api.ohmvision.com): " API_DOMAIN
+read -r -p "Domaine API (ex: api.ohmvision.app): " API_DOMAIN
 read -r -p "Email (Let's Encrypt): " EMAIL
-read -r -p "URL Frontend (ex: https://ohmvision.vercel.app ou https://ohmvision.com): " FRONTEND_URL
+read -r -p "URL Frontend (défaut: https://ohmvision.app): " FRONTEND_URL
 read -r -p "Clé SSH (défaut: ~/.ssh/id_rsa): " SSH_KEY
 SSH_KEY=${SSH_KEY:-~/.ssh/id_rsa}
+FRONTEND_URL=${FRONTEND_URL:-https://ohmvision.app}
+
+echo ""
+print_info "Base de données: tu es sur Supabase, donc on peut utiliser Supabase (recommandé)."
+read -r -p "Utiliser Supabase (DATABASE_URL) ? (yes/no) [yes]: " USE_SUPABASE
+USE_SUPABASE=${USE_SUPABASE:-yes}
+
+if [[ "$USE_SUPABASE" == "yes" ]]; then
+  read -r -p "DATABASE_URL Supabase (postgresql+asyncpg://...): " DATABASE_URL
+  read -r -p "SUPABASE_URL (optionnel): " SUPABASE_URL
+  read -r -p "SUPABASE_ANON_KEY (optionnel): " SUPABASE_ANON_KEY
+
+  if [[ -z "${DATABASE_URL}" ]]; then
+    print_error "DATABASE_URL est requis si USE_SUPABASE=yes"
+    exit 1
+  fi
+fi
 
 print_info "CORS: ajoute ton domaine Vercel + domaine prod."
-read -r -p "CORS_ORIGINS (ex: https://ohmvision.vercel.app,https://ohmvision.com): " CORS_ORIGINS
+DEFAULT_CORS="https://ohmvision.app,https://www.ohmvision.app,https://ohmvision.fr,https://www.ohmvision.fr"
+read -r -p "CORS_ORIGINS (défaut: ${DEFAULT_CORS}): " CORS_ORIGINS
+CORS_ORIGINS=${CORS_ORIGINS:-$DEFAULT_CORS}
 read -r -p "CORS_ORIGIN_REGEX optionnel (ex: https://.*\\.vercel\\.app$) [laisser vide si non]: " CORS_ORIGIN_REGEX
+
+if [[ -z "${SERVER_IP}" || -z "${API_DOMAIN}" || -z "${EMAIL}" ]]; then
+  print_error "Champs requis manquants (SERVER_IP, API_DOMAIN, EMAIL)"
+  exit 1
+fi
 
 echo ""
 print_info "Récapitulatif"
 echo "  Server:     $SERVER_IP"
 echo "  API domain:  $API_DOMAIN"
 echo "  Frontend:    $FRONTEND_URL"
+echo "  Supabase:    $USE_SUPABASE"
 echo "  CORS:        $CORS_ORIGINS"
 echo "  CORS regex:  ${CORS_ORIGIN_REGEX:-<none>}"
 echo "  SSH key:     $SSH_KEY"
@@ -101,6 +130,11 @@ cat > .env <<EOF
 DOMAIN=$API_DOMAIN
 FRONTEND_URL=$FRONTEND_URL
 
+# Si Supabase
+DATABASE_URL=$DATABASE_URL
+SUPABASE_URL=$SUPABASE_URL
+SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
+
 POSTGRES_DB=ohmvision
 POSTGRES_USER=ohmvision
 POSTGRES_PASSWORD=\$(openssl rand -base64 32)
@@ -121,11 +155,16 @@ mkdir -p uploads logs logs/nginx
 sed -i "s/__DOMAIN__/$API_DOMAIN/g" docker/nginx-api.conf
 
 # Start nginx + certbot for initial challenge
-docker compose -f docker-compose.hetzner.api.yml up -d nginx certbot
+COMPOSE_FILE="docker-compose.hetzner.api.yml"
+if [ "$USE_SUPABASE" = "yes" ]; then
+  COMPOSE_FILE="docker-compose.hetzner.api.supabase.yml"
+fi
+
+docker compose -f "$COMPOSE_FILE" up -d nginx certbot
 sleep 5
 
 # Issue cert
-docker compose -f docker-compose.hetzner.api.yml exec -T certbot certbot certonly \
+docker compose -f "$COMPOSE_FILE" exec -T certbot certbot certonly \
   --webroot \
   --webroot-path=/var/www/certbot \
   --email $EMAIL \
@@ -134,7 +173,7 @@ docker compose -f docker-compose.hetzner.api.yml exec -T certbot certbot certonl
   -d $API_DOMAIN
 
 # Restart full stack
-docker compose -f docker-compose.hetzner.api.yml up -d --build
+docker compose -f "$COMPOSE_FILE" up -d --build
 
 echo "Deployed OK"
 ENDSSH

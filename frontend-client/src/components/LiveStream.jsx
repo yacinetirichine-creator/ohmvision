@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Camera, WifiOff, RefreshCw, Loader } from 'lucide-react';
+import { apiUrl } from '../services/apiBase';
 
 /**
  * Composant d'affichage du flux vidéo en direct
@@ -55,7 +56,7 @@ const LiveStream = ({
 
     try {
       // Démarrer le stream côté serveur
-      const response = await fetch('/api/streaming/start', {
+      const response = await fetch(apiUrl('/streaming/start'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -74,7 +75,7 @@ const LiveStream = ({
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Vérifier que le stream est actif
-      const infoResponse = await fetch(`/api/streaming/info/${cameraId}`);
+      const infoResponse = await fetch(apiUrl(`/streaming/info/${cameraId}`));
       if (infoResponse.ok) {
         const info = await infoResponse.json();
         setStreamInfo(info);
@@ -102,7 +103,7 @@ const LiveStream = ({
 
   const _stopStream = async () => {
     try {
-      await fetch(`/api/streaming/stop/${cameraId}`, { method: 'POST' });
+      await fetch(apiUrl(`/streaming/stop/${cameraId}`), { method: 'POST' });
     } catch (err) {
       console.error('Stop stream error:', err);
     }
@@ -125,7 +126,7 @@ const LiveStream = ({
   };
 
   // URL du stream MJPEG
-  const streamUrl = `/api/streaming/mjpeg/${cameraId}?fps=${fps}&quality=${quality}&t=${Date.now()}`;
+  const streamUrl = apiUrl(`/streaming/mjpeg/${cameraId}?fps=${fps}&quality=${quality}&t=${Date.now()}`);
 
   return (
     <div className="relative bg-gray-900 rounded-lg overflow-hidden aspect-video">
@@ -261,7 +262,7 @@ export const CameraSnapshot = ({ cameraId, refreshInterval = 5000, className = '
 
   return (
     <img
-      src={`/api/streaming/snapshot/${cameraId}?quality=80&t=${timestamp}`}
+      src={apiUrl(`/streaming/snapshot/${cameraId}?quality=80&t=${timestamp}`)}
       alt="Camera snapshot"
       className={`object-contain ${className}`}
     />
