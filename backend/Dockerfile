@@ -1,34 +1,29 @@
 # OhmVision Backend - Dockerfile
 # ================================
 # Compatible Railway, Render, et autres PaaS
-# Multi-stage build with optional GPU support
+# Version optimisée pour Railway (limite 4GB)
 
-ARG USE_GPU=false
 ARG PYTHON_VERSION=3.11
+ARG LIGHT_MODE=true
 
 FROM python:${PYTHON_VERSION}-slim as base
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Install system dependencies (minimal)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     gcc \
-    libgl1 \
-    libglib2.0-0 \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 # Copy requirements first (for better caching)
+COPY requirements-light.txt .
 COPY requirements.txt .
-COPY requirements-gpu.txt* ./
 
-# Install Python dependencies (CPU by default)
-RUN if [ "$USE_GPU" = "true" ] && [ -f requirements-gpu.txt ]; then \
-        pip install --no-cache-dir -r requirements-gpu.txt ; \
-    else \
-        pip install --no-cache-dir -r requirements.txt ; \
-    fi
+# Install Python dependencies (LIGHT version for Railway free tier)
+RUN pip install --no-cache-dir -r requirements-light.txt
 
 # Copy application code
 COPY . .
