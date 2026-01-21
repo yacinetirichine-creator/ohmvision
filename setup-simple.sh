@@ -1,7 +1,7 @@
 #!/bin/bash
 #================================================================
 # 🎯 OHMVISION - SCRIPT DE CONFIGURATION SIMPLIFIÉ
-# Pour novices - Usage: ./setup-simple.sh [local|deploy IP]
+# Pour novices - Usage: ./setup-simple.sh [local|railway]
 #================================================================
 
 set -e
@@ -43,7 +43,9 @@ check_docker() {
 
 # Générer des secrets sécurisés
 generate_secret() {
-    openssl rand -hex 32 2>/dev/null || cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1
+    python3 -c "import secrets; print(secrets.token_urlsafe(32))" 2>/dev/null || \
+    openssl rand -base64 32 | tr -d '/+=' | head -c 32 || \
+    cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1
 }
 
 # Configuration LOCAL
@@ -59,6 +61,7 @@ setup_local() {
 # Application
 APP_NAME=OhmVision
 DEBUG=true
+ENVIRONMENT=development
 
 # Secrets (générés automatiquement)
 EOF
@@ -98,175 +101,135 @@ EOF
     info "Puis ouvre : ${GREEN}http://localhost:8000${NC}"
 }
 
-# Configuration PRODUCTION (Hetzner)
-setup_production() {
-    local SERVER_IP=$1
+# Configuration RAILWAY
+setup_railway() {
+    info "Préparation pour déploiement Railway..."
     
-    if [ -z "$SERVER_IP" ]; then
-        error "Usage: ./setup-simple.sh deploy IP_DU_SERVEUR"
+    # Vérifier si Railway CLI est installé
+    if ! command -v railway &> /dev/null; then
+        warning "Railway CLI n'est pas installé"
+        info "Installation..."
+        npm install -g @railway/cli 2>/dev/null || {
+            error "Impossible d'installer Railway CLI. Installe npm d'abord."
+        }
     fi
-    
-    info "Déploiement sur Hetzner: $SERVER_IP"
-    
-    # Tester la connexion SSH
-    info "Test de connexion SSH..."
-    if ! ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no root@$SERVER_IP "echo 'OK'" 2>/dev/null; then
-        error "Impossible de se connecter au serveur. Vérifie ton IP et ta clé SSH."
-    fi
-    success "Connexion SSH OK"
+    success "Railway CLI installé"
     
     # Générer les secrets
     local SECRET_KEY=$(generate_secret)
     local JWT_SECRET=$(generate_secret)
-    local DB_PASSWORD="OhmVision$(generate_secret | head -c 16)"
-    local REDIS_PASSWORD="Redis$(generate_secret | head -c 16)"
     
-    # Créer le fichier .env pour production
-    cat > .env.production << EOF
+    # Créer un fichier de référence pour Railway
+    cat > .env.railway.generated << EOF
 # ============================================
-# OhmVision - Production Hetzner
-# Serveur: $SERVER_IP
+# OhmVision - Variables pour Railway
 # Généré le: $(date)
 # ============================================
+# Copiez ces valeurs dans Railway Dashboard → Variables
 
-# Application
-APP_NAME=OhmVision
-APP_ENV=production
-DEBUG=false
-
-# URLs
-DOMAIN=$SERVER_IP
-BACKEND_URL=http://$SERVER_IP
-FRONTEND_URL=http://$SERVER_IP
-
-# Secrets
 SECRET_KEY=$SECRET_KEY
 JWT_SECRET_KEY=$JWT_SECRET
+DEBUG=false
+ENVIRONMENT=production
+PYTHONUNBUFFERED=1
 
-# Database
-POSTGRES_DB=ohmvision
-POSTGRES_USER=ohmvision
-POSTGRES_PASSWORD=$DB_PASSWORD
-DATABASE_URL=postgresql+asyncpg://ohmvision:$DB_PASSWORD@postgres:5432/ohmvision
+# CORS - Ajoutez votre URL frontend Vercel
+CORS_ORIGINS=https://votre-app.vercel.app,http://localhost:3000
 
-# Redis
-REDIS_PASSWORD=$REDIS_PASSWORD
-REDIS_URL=redis://:$REDIS_PASSWORD@redis:6379/0
-
-# CORS (accepte tout pour commencer)
-CORS_ORIGINS=*
-
-# IA (optionnel)
-ANTHROPIC_API_KEY=
-OPENAI_API_KEY=
-
-# Stripe (optionnel)
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
-
-# Storage
-STORAGE_PATH=/opt/ohmvision/storage
+# Ces variables sont auto-générées par Railway:
+# DATABASE_URL=\${{Postgres.DATABASE_URL}}
+# REDIS_URL=\${{Redis.REDIS_URL}}
 EOF
     
-    success "Configuration production générée"
-    
-    # Installer Docker sur le serveur
-    info "Installation de Docker sur le serveur (2-3 min)..."
-    ssh root@$SERVER_IP << 'INSTALL_DOCKER'
-set -e
-apt-get update -qq
-apt-get install -y -qq ca-certificates curl gnupg
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-chmod a+r /etc/apt/keyrings/docker.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt-get update -qq
-apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-compose-plugin
-systemctl enable docker
-systemctl start docker
-INSTALL_DOCKER
-    success "Docker installé"
-    
-    # Créer le répertoire sur le serveur
-    info "Copie des fichiers..."
-    ssh root@$SERVER_IP "mkdir -p /opt/ohmvision"
-    
-    # Copier les fichiers
-    rsync -avz --progress \
-        --exclude 'node_modules' \
-        --exclude '.git' \
-        --exclude 'venv' \
-        --exclude '__pycache__' \
-        --exclude '*.pyc' \
-        --exclude '.env' \
-        ./ root@$SERVER_IP:/opt/ohmvision/
-    
-    # Copier la config production
-    scp .env.production root@$SERVER_IP:/opt/ohmvision/.env
-    scp .env.production root@$SERVER_IP:/opt/ohmvision/backend/.env
-    
-    success "Fichiers copiés"
-    
-    # Lancer les services
-    info "Démarrage des services (5-8 min)..."
-    ssh root@$SERVER_IP << 'START_SERVICES'
-cd /opt/ohmvision
-docker compose pull
-docker compose up -d --build
-echo "Attente du démarrage..."
-sleep 30
-docker compose ps
-START_SERVICES
-    
-    success "Services démarrés !"
+    success "Fichier .env.railway.generated créé avec vos clés secrètes"
     
     echo ""
-    echo -e "${GREEN}╔═══════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║   🎉 DÉPLOIEMENT TERMINÉ AVEC SUCCÈS !    ║${NC}"
-    echo -e "${GREEN}╚═══════════════════════════════════════════╝${NC}"
+    echo -e "${CYAN}══════════════════════════════════════════════════════════${NC}"
+    echo -e "${GREEN}  Clés secrètes générées :${NC}"
     echo ""
-    echo -e "🌐 Ton application est accessible sur :"
-    echo -e "   ${CYAN}http://$SERVER_IP${NC}"
+    echo -e "  SECRET_KEY=${YELLOW}$SECRET_KEY${NC}"
+    echo -e "  JWT_SECRET_KEY=${YELLOW}$JWT_SECRET${NC}"
     echo ""
-    echo -e "📖 Documentation API :"
-    echo -e "   ${CYAN}http://$SERVER_IP/docs${NC}"
+    echo -e "${CYAN}══════════════════════════════════════════════════════════${NC}"
     echo ""
-    echo -e "🔧 Commandes utiles (sur le serveur) :"
-    echo -e "   ${YELLOW}ssh root@$SERVER_IP${NC}"
-    echo -e "   ${YELLOW}cd /opt/ohmvision && docker compose logs -f${NC}"
+    
+    read -p "Voulez-vous vous connecter à Railway maintenant ? [O/n]: " connect
+    if [[ "$connect" != "n" && "$connect" != "N" ]]; then
+        railway login
+        
+        echo ""
+        read -p "Créer un nouveau projet Railway ? [O/n]: " create
+        if [[ "$create" != "n" && "$create" != "N" ]]; then
+            railway init
+            
+            echo ""
+            info "Projet créé ! Maintenant :"
+            echo ""
+            echo "  1. Allez sur https://railway.app/dashboard"
+            echo "  2. Cliquez sur votre projet"
+            echo "  3. Ajoutez PostgreSQL : + New → Database → PostgreSQL"
+            echo "  4. Ajoutez Redis : + New → Database → Redis"
+            echo "  5. Configurez les Variables avec les clés ci-dessus"
+            echo ""
+            
+            read -p "Déployer maintenant ? [O/n]: " deploy
+            if [[ "$deploy" != "n" && "$deploy" != "N" ]]; then
+                railway up --detach
+                success "Déploiement lancé !"
+                echo ""
+                info "Suivez les logs avec : railway logs -f"
+            fi
+        fi
+    fi
+    
     echo ""
+    success "Configuration Railway terminée !"
+    echo ""
+    info "Documentation complète : DEPLOYMENT_RAILWAY_COMPLETE.md"
 }
 
-# Afficher l'aide
-show_help() {
-    echo "Usage: ./setup-simple.sh [COMMANDE]"
+# Menu principal
+show_menu() {
+    show_logo
     echo ""
-    echo "Commandes:"
-    echo "  local          Configure pour développement local"
-    echo "  deploy IP      Déploie sur un serveur Hetzner"
-    echo "  help           Affiche cette aide"
+    echo "Que souhaitez-vous faire ?"
     echo ""
-    echo "Exemples:"
-    echo "  ./setup-simple.sh local"
-    echo "  ./setup-simple.sh deploy 195.201.123.92"
+    echo "  1) 🏠 Configuration LOCAL (Docker sur ton PC)"
+    echo "  2) 🚀 Déploiement RAILWAY (Production cloud)"
+    echo "  3) ❌ Quitter"
+    echo ""
+    read -p "Votre choix [1-3]: " choice
+    
+    case $choice in
+        1)
+            check_docker
+            setup_local
+            ;;
+        2)
+            setup_railway
+            ;;
+        3)
+            info "Au revoir !"
+            exit 0
+            ;;
+        *)
+            error "Choix invalide"
+            ;;
+    esac
 }
 
-# Main
-show_logo
-
-case "${1:-help}" in
+# Point d'entrée
+case "${1:-}" in
     local)
+        show_logo
         check_docker
         setup_local
         ;;
-    deploy)
-        check_docker
-        setup_production "$2"
-        ;;
-    help|--help|-h)
-        show_help
+    railway)
+        show_logo
+        setup_railway
         ;;
     *)
-        error "Commande inconnue: $1. Utilise './setup-simple.sh help'"
+        show_menu
         ;;
 esac

@@ -330,8 +330,7 @@ cd frontend-client && npm install && npm run dev
 |------------|------------|------|---------------|
 | **Railway** ⭐ | Facile | ~$35/mois | [Guide](DEPLOYMENT_RAILWAY_COMPLETE.md) |
 | Render | Facile | ~$25/mois | - |
-| Vercel + Supabase | Moyen | ~$20/mois | [Guide](DEPLOYMENT_VERCEL_HETZNER.md) |
-| Hetzner (VPS) | Avancé | ~€10/mois | [Guide](DEPLOYMENT_HETZNER.md) |
+| Vercel + Supabase | Moyen | ~$20/mois | - |
 | AWS/GCP | Expert | Variable | - |
 
 ---
