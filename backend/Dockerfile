@@ -1,29 +1,33 @@
 # OhmVision Backend - Dockerfile
 # ================================
-# Compatible Railway, Render, et autres PaaS
-# Version optimisée pour Railway (limite 4GB)
+# Compatible Railway Pro, Render, et autres PaaS
+# Version complète avec IA (PyTorch, YOLO, OpenCV)
 
 ARG PYTHON_VERSION=3.11
-ARG LIGHT_MODE=true
 
 FROM python:${PYTHON_VERSION}-slim as base
 
 WORKDIR /app
 
-# Install system dependencies (minimal)
+# Install system dependencies (full version with OpenCV support)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     gcc \
+    libgl1 \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    ffmpeg \
     curl \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
 # Copy requirements first (for better caching)
-COPY requirements-light.txt .
 COPY requirements.txt .
 
-# Install Python dependencies (LIGHT version for Railway free tier)
-RUN pip install --no-cache-dir -r requirements-light.txt
+# Install Python dependencies (FULL version with AI)
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY . .
