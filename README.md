@@ -275,11 +275,26 @@ ohmvision-platform/
 
 ## 🚀 INSTALLATION
 
-### Option 1: Script automatique
+### Option 1: **Railway (Recommandé - Production)**
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/ohmvision)
+
+```bash
+# Ou via CLI
+npm install -g @railway/cli
+railway login
+railway init
+railway up
+```
+
+📖 Guide complet: [DEPLOYMENT_RAILWAY_COMPLETE.md](DEPLOYMENT_RAILWAY_COMPLETE.md)
+
+### Option 2: Script automatique (Local)
 
 **Windows:**
 ```cmd
-install-windows.bat
+.\setup-windows.ps1
+# Ou: start-windows.bat
 ```
 
 **Linux/Mac:**
@@ -287,7 +302,7 @@ install-windows.bat
 chmod +x install.sh && ./install.sh
 ```
 
-### Option 2: Docker
+### Option 3: Docker
 
 ```bash
 docker build -t ohmvision:latest -f Dockerfile.allinone .
@@ -295,7 +310,7 @@ docker run -d -p 8080:8080 --name ohmvision ohmvision:latest
 # Ouvrir http://localhost:8080
 ```
 
-### Option 3: Développement
+### Option 4: Développement local
 
 ```bash
 # Backend
@@ -306,6 +321,18 @@ uvicorn main:app --reload --port 8000
 cd frontend-client && npm install && npm run dev
 # Ouvrir http://localhost:5173
 ```
+
+---
+
+## ☁️ DÉPLOIEMENT PRODUCTION
+
+| Plateforme | Difficulté | Coût | Documentation |
+|------------|------------|------|---------------|
+| **Railway** ⭐ | Facile | ~$35/mois | [Guide](DEPLOYMENT_RAILWAY_COMPLETE.md) |
+| Render | Facile | ~$25/mois | - |
+| Vercel + Supabase | Moyen | ~$20/mois | [Guide](DEPLOYMENT_VERCEL_HETZNER.md) |
+| Hetzner (VPS) | Avancé | ~€10/mois | [Guide](DEPLOYMENT_HETZNER.md) |
+| AWS/GCP | Expert | Variable | - |
 
 ---
 

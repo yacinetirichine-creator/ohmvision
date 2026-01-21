@@ -1,0 +1,19 @@
+# Railway Configuration for OhmVision
+# This file configures the Railway deployment
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "backend/Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
+
+# Environment variables template
+# Copy these to Railway Dashboard > Variables
+[env]
+DEBUG = "false"
+ENVIRONMENT = "production"
+PYTHONUNBUFFERED = "1"

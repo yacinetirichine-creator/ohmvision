@@ -1,4 +1,5 @@
-# OhmVision Platform - Backend Dependencies
+# OhmVision Platform - Backend Dependencies (GPU Version for Windows/Linux with NVIDIA GPU)
+# Pour installer: pip install -r requirements-gpu.txt
 
 # Web Framework
 fastapi==0.109.0
@@ -18,13 +19,13 @@ greenlet>=3.0.0
 redis==5.0.1
 celery==5.3.6
 
-# AI & Computer Vision
+# AI & Computer Vision - GPU OPTIMIZED
 ultralytics>=8.2.0
 opencv-python-headless==4.9.0.80
 numpy==1.26.3
-torch>=2.0.0
-torchvision>=0.15.0
-onnxruntime>=1.16.0  # CPU version - Use onnxruntime-gpu for NVIDIA GPU support on Windows/Linux
+torch>=2.0.0+cu118  # PyTorch with CUDA 11.8 support
+torchvision>=0.15.0+cu118
+onnxruntime-gpu>=1.16.0  # GPU-accelerated ONNX Runtime
 pillow==10.2.0
 
 # LLM / Agent IA
